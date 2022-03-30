@@ -18,6 +18,7 @@ class Follower:
         self.laser_sub = rospy.Subscriber('/scan', LaserScan, self.laser_callback)
         self.cmd_vel_pub = rospy.Publisher('/mobile_base/commands/velocity', Twist, queue_size=1)
         self.twist = Twist()
+        self.prev_direction = "left"
 
     def laser_callback(self, msg):
         ranges = [x for x in msg.ranges if str(x) != 'nan']
@@ -30,7 +31,12 @@ class Follower:
         else:
             print "turning"
             self.twist.linear.x = 0
-            self.twist.angular.z = 1
+            if prev_direction == 'left':
+                self.twist.angular.z = 1.5708
+                prev_direction = 'right'
+            else:
+                self.twist.angular.z = -1.5708
+                prev_direction = 'left'
             self.cmd_vel_pub.publish(self.twist)
 
     def image_callback(self, msg):
