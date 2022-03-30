@@ -29,7 +29,7 @@ class Follower:
             print "still turning"
             print dist
             print self.prev_direction
-            if dist > 0.5:
+            if dist > 0.75:
                 self.twist.angular.z = 0
                 self.still_turning = False
                 time.sleep(1)
@@ -39,7 +39,7 @@ class Follower:
                 self.twist.angular.z = -1.5
 
         else:
-            if dist > 0.5:
+            if dist > 0.75:
                 print "moving"
                 self.twist.linear.x = 0.5
                 self.twist.angular.z = 0
