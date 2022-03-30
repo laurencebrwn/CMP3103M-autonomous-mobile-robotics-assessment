@@ -41,7 +41,7 @@ class Follower:
                 print "moving"
                 self.twist.linear.x = 0.5
                 self.twist.angular.z = 0
-                self.cmd_vel_pub.publish(self.twist)
+
             else:
                 self.still_turning = True
                 print "turning"
@@ -52,8 +52,8 @@ class Follower:
                 else:
                     self.twist.angular.z = -1.5708
                     self.prev_direction = 'left'
-                self.cmd_vel_pub.publish(self.twist)
-                #time.sleep(1)
+
+        self.cmd_vel_pub.publish(self.twist)
 
     def image_callback(self, msg):
         cv2.namedWindow("window", 1)
