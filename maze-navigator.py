@@ -29,29 +29,45 @@ class Follower:
         right_dist = self.get_range_right_dist(ranges)
         min_dist = min(ranges)
 
-        if min_dist > 0.5:
-            if middle_dist > left_dist and middle_dist > right_dist:
-                print "moving forward"
-                self.twist.linear.x = 0.5
+        if self.still_turning == True:
+            print "still turning"
+            print dist
+            print self.prev_direction
+            if min_dist > 0.5:
                 self.twist.angular.z = 0
-            elif left_dist > middle_dist and left_dist > right_dist:
-                print "moving left"
-                self.twist.linear.x = 0.5
-                self.twist.angular.z = -0.5
-            elif right_dist > middle_dist and right_dist > left_dist:
-                print "moving right"
-                self.twist.linear.x = 0.5
+                self.still_turning = False
+                time.sleep(1)
+            elif self.prev_direction == 'right':
                 self.twist.angular.z = 0.5
-
+            elif self.prev_direction == 'left':
+                self.twist.angular.z = -0.5
         else:
-            print "turning"
-            self.twist.linear.x = 0
-            if left_dist > right_dist:
-                print "moving left"
-                self.twist.angular.z = -0.5
+            if min_dist > 0.5:
+                if middle_dist > left_dist and middle_dist > right_dist:
+                    print "moving forward"
+                    self.twist.linear.x = 0.5
+                    self.twist.angular.z = 0
+                elif left_dist > middle_dist and left_dist > right_dist:
+                    print "moving left"
+                    self.twist.linear.x = 0.5
+                    self.twist.angular.z = -0.5
+                elif right_dist > middle_dist and right_dist > left_dist:
+                    print "moving right"
+                    self.twist.linear.x = 0.5
+                    self.twist.angular.z = 0.5
+
             else:
-                print "moving right"
-                self.twist.angular.z = 0.5
+                self.still_turning = True
+                print "turning"
+                self.twist.linear.x = 0
+                if left_dist > right_dist:
+                    print "moving left"
+                    self.twist.angular.z = -0.5
+                    self.prev_direction = 'left'
+                else:
+                    print "moving right"
+                    self.twist.angular.z = 0.5
+                    self.prev_direction = 'right'
 
         self.cmd_vel_pub.publish(self.twist)
 
