@@ -28,6 +28,7 @@ class Follower:
         if self.still_turning == True:
             print "still turning"
             print dist
+            print self.prev_direction
             if dist > 1:
                 self.still_turning = False
             elif self.prev_direction == 'right':
