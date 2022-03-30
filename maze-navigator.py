@@ -30,7 +30,7 @@ class Follower:
         min_dist = min([left_dist, middle_dist, right_dist])
         if self.still_turning == True:
             print "still turning"
-            print dist
+            print min_dist
             print self.prev_direction
             if min_dist > 0.65:
                 self.twist.angular.z = 0
