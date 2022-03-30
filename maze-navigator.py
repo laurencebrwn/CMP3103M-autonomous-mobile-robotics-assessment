@@ -20,6 +20,7 @@ class Follower:
         self.cmd_vel_pub = rospy.Publisher('/mobile_base/commands/velocity', Twist, queue_size=1)
         self.twist = Twist()
         self.prev_direction = "left"
+        self.still_turning = False
 
     def laser_callback(self, msg):
         ranges = [x for x in msg.ranges if str(x) != 'nan']
@@ -27,6 +28,11 @@ class Follower:
         if self.still_turning == True:
             if dist > 1:
                 self.still_turning = False
+            else if self.prev_direction == 'right':
+                self.twist.angular.z = 1.5708
+            else if self.prev_direction == 'left':
+                self.twist.angular.z = -1.5708
+
         else:
             if dist > 1:
                 print "moving"
