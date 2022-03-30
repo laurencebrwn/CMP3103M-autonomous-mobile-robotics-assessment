@@ -30,11 +30,13 @@ class Follower:
             print dist
             print self.prev_direction
             if dist > 1:
+                self.twist.angular.z = 0
                 self.still_turning = False
+                time.sleep(1)
             elif self.prev_direction == 'right':
-                self.twist.angular.z = 1.5708
+                self.twist.angular.z = 1.5
             elif self.prev_direction == 'left':
-                self.twist.angular.z = -1.5708
+                self.twist.angular.z = -1.5
 
         else:
             if dist > 1:
@@ -47,10 +49,10 @@ class Follower:
                 print "turning"
                 self.twist.linear.x = 0
                 if self.prev_direction == 'left':
-                    self.twist.angular.z = 1.5708
+                    self.twist.angular.z = 1.5
                     self.prev_direction = 'right'
                 else:
-                    self.twist.angular.z = -1.5708
+                    self.twist.angular.z = -1.5
                     self.prev_direction = 'left'
 
         self.cmd_vel_pub.publish(self.twist)
