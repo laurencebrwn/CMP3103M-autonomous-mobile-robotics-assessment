@@ -20,7 +20,13 @@ class Follower:
         self.twist = Twist()
 
     def laser_callback(self, msg):
-        print msg
+        if msg > 0.01:
+            self.twist.linear.x = 0.2
+            self.cmd_vel_pub.publish(self.twist)
+        else:
+            self.twist.linear.x = 0
+            self.twist.angular.z = 90 / 100
+            self.cmd_vel_pub.publish(self.twist)
 
     def image_callback(self, msg):
         cv2.namedWindow("window", 1)
