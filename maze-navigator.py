@@ -20,12 +20,14 @@ class Follower:
         self.twist = Twist()
 
     def laser_callback(self, msg):
-        if msg > 0.01:
+        if msg > 0.1:
+            print "moving"
             self.twist.linear.x = 0.2
             self.cmd_vel_pub.publish(self.twist)
         else:
+            print "turning"
             self.twist.linear.x = 0
-            self.twist.angular.z = 90 / 100
+            self.twist.angular.z = 1
             self.cmd_vel_pub.publish(self.twist)
 
     def image_callback(self, msg):
