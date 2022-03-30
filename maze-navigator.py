@@ -27,11 +27,12 @@ class Follower:
         left_dist = self.get_range_left_dist(ranges)
         middle_dist = self.get_range_middle_dist(ranges)
         right_dist = self.get_range_right_dist(ranges)
+        min_dist = min([left_dist, middle_dist, right_dist])
         if self.still_turning == True:
             print "still turning"
             print dist
             print self.prev_direction
-            if dist > 0.65:
+            if min_dist > 0.65:
                 self.twist.angular.z = 0
                 self.still_turning = False
                 time.sleep(1)
@@ -41,7 +42,7 @@ class Follower:
                 self.twist.angular.z = -1.5
 
         else:
-            if dist > 0.65:
+            if min_dist > 0.65:
                 if middle_dist > left_dist and middle_dist > right_dist:
                     print "moving forward"
                     self.twist.linear.x = 0.5
