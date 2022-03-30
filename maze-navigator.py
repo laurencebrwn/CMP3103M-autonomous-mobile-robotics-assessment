@@ -29,7 +29,7 @@ class Follower:
             self.cmd_vel_pub.publish(self.twist)
         else:
             print "turning"
-            self.twist.linear.x = 0.2
+            self.twist.linear.x = 0
             self.twist.angular.z = 1
             self.cmd_vel_pub.publish(self.twist)
 
