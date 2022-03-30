@@ -27,16 +27,46 @@ class Follower:
         left_dist = self.get_range_left_dist(ranges)
         middle_dist = self.get_range_middle_dist(ranges)
         right_dist = self.get_range_right_dist(ranges)
+        if self.still_turning == True:
+            print "still turning"
+            print dist
+            print self.prev_direction
+            if dist > 0.65:
+                self.twist.angular.z = 0
+                self.still_turning = False
+                time.sleep(1)
+            elif self.prev_direction == 'right':
+                self.twist.angular.z = 1.5
+            elif self.prev_direction == 'left':
+                self.twist.angular.z = -1.5
 
-        if middle_dist > left_dist and middle_dist > right_dist:
-            self.twist.linear.x = 0.5
-            self.twist.angular.z = 0
-        elif left_dist > middle_dist and left_dist > right_dist:
-            self.twist.linear.x = 0.5
-            self.twist.angular.z = -0.5
-        elif right_dist > middle_dist and right_dist > left_dist:
-            self.twist.linear.x = 0.5
-            self.twist.angular.z = 0.5
+        else:
+            if dist > 0.65:
+                if middle_dist > left_dist and middle_dist > right_dist:
+                    print "moving forward"
+                    self.twist.linear.x = 0.5
+                    self.twist.angular.z = 0
+                elif left_dist > middle_dist and left_dist > right_dist:
+                    print "moving left"
+                    self.twist.linear.x = 0.5
+                    self.twist.angular.z = -0.5
+                elif right_dist > middle_dist and right_dist > left_dist:
+                    print "moving right"
+                    self.twist.linear.x = 0.5
+                    self.twist.angular.z = 0.5
+
+
+            else:
+                self.still_turning = True
+                print "turning"
+                self.twist.linear.x = 0
+                if self.prev_direction == 'left':
+                    self.twist.angular.z = 1.5
+                    self.prev_direction = 'right'
+                else:
+                    self.twist.angular.z = -1.5
+                    self.prev_direction = 'left'
+
         self.cmd_vel_pub.publish(self.twist)
 
     def laser_callback_left_right(self, msg):
