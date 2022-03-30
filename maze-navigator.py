@@ -20,9 +20,9 @@ class Follower:
         self.twist = Twist()
 
     def laser_callback(self, msg):
-        if msg > 0.5:
-            ranges = [x for x in msg.ranges if str(x) != 'nan']
-            print sum(ranges)/len(ranges)
+        ranges = [x for x in msg.ranges if str(x) != 'nan']
+        dist = sum(ranges)/len(ranges)
+        if dist > 0.5:
             print "moving"
             self.twist.linear.x = 0.2
             self.cmd_vel_pub.publish(self.twist)
