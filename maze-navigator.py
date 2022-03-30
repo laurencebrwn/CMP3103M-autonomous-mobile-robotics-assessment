@@ -59,7 +59,7 @@ class Follower:
 
     def get_range_middle_dist(self, ranges):
         # initializing K
-        K = 50
+        K = 100
 
         # computing strt, and end index
         strt_idx = (len(ranges) // 2) - (K // 2)
@@ -73,7 +73,7 @@ class Follower:
             if idx >= strt_idx and idx <= end_idx:
                 middle.append(ranges[idx])
 
-        return sum(middle)/len(middle)
+        return min(middle)
 
     def image_callback(self, msg):
         cv2.namedWindow("window", 1)
