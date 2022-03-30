@@ -59,7 +59,7 @@ class Follower:
 
     def get_range_middle_dist(self, ranges):
         # initializing K
-        K = 100
+        K = len(ranges)/1.5
 
         # computing strt, and end index
         strt_idx = (len(ranges) // 2) - (K // 2)
