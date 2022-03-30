@@ -15,7 +15,7 @@ class Follower:
     def __init__(self):
         self.bridge = cv_bridge.CvBridge()
         #self.image_sub = rospy.Subscriber('/camera/rgb/image_raw', Image, self.image_callback)
-        self.laser_sub = rospy.Subscriber('/scan', LaserScanLaserScan, self.laser_callback)
+        self.laser_sub = rospy.Subscriber('/scan', LaserScan, self.laser_callback)
         self.cmd_vel_pub = rospy.Publisher('/mobile_base/commands/velocity', Twist, queue_size=1)
         self.twist = Twist()
 
