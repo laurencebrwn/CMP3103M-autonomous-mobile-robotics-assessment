@@ -21,6 +21,7 @@ class Follower:
 
     def laser_callback(self, msg):
         if msg > 0.5:
+            print msg
             print "moving"
             self.twist.linear.x = 0.2
             self.cmd_vel_pub.publish(self.twist)
