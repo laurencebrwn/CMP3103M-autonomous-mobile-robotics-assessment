@@ -29,7 +29,7 @@ class Follower:
             print "still turning"
             print dist
             print self.prev_direction
-            if dist > 0.75:
+            if dist > 0.65:
                 self.twist.angular.z = 0
                 self.still_turning = False
                 time.sleep(1)
@@ -39,7 +39,7 @@ class Follower:
                 self.twist.angular.z = -1.5
 
         else:
-            if dist > 0.75:
+            if dist > 0.65:
                 print "moving"
                 self.twist.linear.x = 0.5
                 self.twist.angular.z = 0
@@ -59,7 +59,7 @@ class Follower:
 
     def get_range_middle_dist(self, ranges):
         # initializing K
-        K = len(ranges)/1.5
+        K = len(ranges)/1.75
 
         # computing strt, and end index
         strt_idx = (len(ranges) // 2) - (K // 2)
