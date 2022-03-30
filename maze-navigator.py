@@ -28,9 +28,9 @@ class Follower:
         if self.still_turning == True:
             if dist > 1:
                 self.still_turning = False
-            else if self.prev_direction == 'right':
+            elif self.prev_direction == 'right':
                 self.twist.angular.z = 1.5708
-            else if self.prev_direction == 'left':
+            elif self.prev_direction == 'left':
                 self.twist.angular.z = -1.5708
 
         else:
