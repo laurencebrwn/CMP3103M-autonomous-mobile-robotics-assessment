@@ -31,12 +31,12 @@ class Follower:
         else:
             print "turning"
             self.twist.linear.x = 0
-            if prev_direction == 'left':
+            if self.prev_direction == 'left':
                 self.twist.angular.z = 1.5708
-                prev_direction = 'right'
+                self.prev_direction = 'right'
             else:
                 self.twist.angular.z = -1.5708
-                prev_direction = 'left'
+                self.prev_direction = 'left'
             self.cmd_vel_pub.publish(self.twist)
 
     def image_callback(self, msg):
