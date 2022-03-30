@@ -16,13 +16,30 @@ class Follower:
     def __init__(self):
         self.bridge = cv_bridge.CvBridge()
         #self.image_sub = rospy.Subscriber('/camera/rgb/image_raw', Image, self.image_callback)
-        self.laser_sub = rospy.Subscriber('/scan', LaserScan, self.laser_callback)
+        self.laser_sub = rospy.Subscriber('/scan', LaserScan, self.laser_callback_follow_open)
         self.cmd_vel_pub = rospy.Publisher('/mobile_base/commands/velocity', Twist, queue_size=1)
         self.twist = Twist()
         self.prev_direction = "left"
         self.still_turning = False
 
-    def laser_callback(self, msg):
+    def laser_callback_follow_open(self, msg):
+        ranges = [x for x in msg.ranges if str(x) != 'nan']
+        left_dist = self.get_range_left_dist(ranges)
+        middle_dist = self.get_range_middle_dist(ranges)
+        right_dist = self.get_range_right_dist(ranges)
+
+        if middle_dist > left_dist and middle_dist > right_dist:
+            self.twist.linear.x = 0.5
+            self.twist.angular.z = 0
+        elif left_dist > middle_dist and left_dist > right_dist:
+            self.twist.linear.x = 0.5
+            self.twist.angular.z = -0.5
+        elif right_dist > middle_dist and right_dist > left_dist:
+            self.twist.linear.x = 0.5
+            self.twist.angular.z = 0.5
+        self.cmd_vel_pub.publish(self.twist)
+
+    def laser_callback_left_right(self, msg):
         ranges = [x for x in msg.ranges if str(x) != 'nan']
         dist = self.get_range_middle_dist(ranges)
         if self.still_turning == True:
@@ -57,13 +74,40 @@ class Follower:
 
         self.cmd_vel_pub.publish(self.twist)
 
-    def get_range_middle_dist(self, ranges):
-        # initializing K
-        K = len(ranges)/1.75
-
+    def get_range_left_dist(self, ranges):
         # computing strt, and end index
-        strt_idx = (len(ranges) // 2) - (K // 2)
-        end_idx = (len(ranges) // 2) + (K // 2)
+        strt_idx = 0
+        end_idx = len(ranges)//3
+
+        # using loop to get indices
+        left = []
+        for idx in range(len(ranges)):
+
+            # checking for elements in range
+            if idx >= strt_idx and idx <= end_idx:
+                left.append(ranges[idx])
+
+        return sum(left)/len(left)
+
+    def get_range_right_dist(self, ranges):
+        # computing strt, and end index
+        strt_idx = (len(ranges) // 3)*2
+        end_idx = len(ranges)
+
+        # using loop to get indices
+        right = []
+        for idx in range(len(ranges)):
+
+            # checking for elements in range
+            if idx >= strt_idx and idx <= end_idx:
+                right.append(ranges[idx])
+
+        return sum(right)/len(right)
+
+    def get_range_middle_dist(self, ranges):
+        # computing strt, and end index
+        strt_idx = (len(ranges) // 3)
+        end_idx = (len(ranges) // 3)*2
 
         # using loop to get indices
         middle = []
@@ -73,7 +117,7 @@ class Follower:
             if idx >= strt_idx and idx <= end_idx:
                 middle.append(ranges[idx])
 
-        return min(middle)
+        return sum(middle)/len(middle)
 
     def image_callback(self, msg):
         cv2.namedWindow("window", 1)
