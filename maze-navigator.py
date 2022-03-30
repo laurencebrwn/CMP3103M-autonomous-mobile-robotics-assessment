@@ -66,14 +66,14 @@ class Follower:
         end_idx = (len(ranges) // 2) + (K // 2)
 
         # using loop to get indices
-        res = []
+        middle = []
         for idx in range(len(ranges)):
 
             # checking for elements in range
             if idx >= strt_idx and idx <= end_idx:
-                res.append(ranges[idx])
+                middle.append(ranges[idx])
 
-        return mean(res)
+        return sum(middle)/len(middle)
 
     def image_callback(self, msg):
         cv2.namedWindow("window", 1)
