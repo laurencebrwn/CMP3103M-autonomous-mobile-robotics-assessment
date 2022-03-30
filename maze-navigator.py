@@ -5,6 +5,7 @@ import numpy
 import cv2
 import cv_bridge
 import rospy
+import time
 
 from sensor_msgs.msg import Image
 from sensor_msgs.msg import LaserScan
@@ -38,6 +39,7 @@ class Follower:
                 self.twist.angular.z = -1.5708
                 self.prev_direction = 'left'
             self.cmd_vel_pub.publish(self.twist)
+            time.sleep(1)
 
     def image_callback(self, msg):
         cv2.namedWindow("window", 1)
