@@ -24,7 +24,7 @@ class Follower:
 
     def laser_callback(self, msg):
         ranges = [x for x in msg.ranges if str(x) != 'nan']
-        dist = get_range_middle_dist(ranges)
+        dist = self.get_range_middle_dist(ranges)
         if self.still_turning == True:
             print "still turning"
             print dist
