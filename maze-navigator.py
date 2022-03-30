@@ -24,7 +24,7 @@ class Follower:
 
     def laser_callback(self, msg):
         ranges = [x for x in msg.ranges if str(x) != 'nan']
-        dist = min(ranges)
+        dist = get_range_middle_dist(ranges)
         if self.still_turning == True:
             print "still turning"
             print dist
@@ -56,6 +56,24 @@ class Follower:
                     self.prev_direction = 'left'
 
         self.cmd_vel_pub.publish(self.twist)
+
+    def get_range_middle_dist(self, ranges):
+        # initializing K
+        K = 50
+
+        # computing strt, and end index
+        strt_idx = (len(ranges) // 2) - (K // 2)
+        end_idx = (len(ranges) // 2) + (K // 2)
+
+        # using loop to get indices
+        res = []
+        for idx in range(len(ranges)):
+
+            # checking for elements in range
+            if idx >= strt_idx and idx <= end_idx:
+                res.append(ranges[idx])
+
+        return mean(res)
 
     def image_callback(self, msg):
         cv2.namedWindow("window", 1)
