@@ -26,6 +26,8 @@ class Follower:
         ranges = [x for x in msg.ranges if str(x) != 'nan']
         dist = sum(ranges)/len(ranges)
         if self.still_turning == True:
+            print "still turning"
+            print dist
             if dist > 1:
                 self.still_turning = False
             elif self.prev_direction == 'right':
