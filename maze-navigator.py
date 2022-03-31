@@ -37,6 +37,7 @@ class Follower:
 
     def red_movement(self, ranges):
         self.twist.linear.x = 0
+        self.still_turning = True
         if self.moving_from_red[1] == "right":
             self.twist.angular.z = 1
         else:
