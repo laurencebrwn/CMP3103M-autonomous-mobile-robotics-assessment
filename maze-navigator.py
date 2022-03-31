@@ -36,18 +36,11 @@ class Follower:
         self.cmd_vel_pub.publish(self.twist)
 
     def red_movement(self, ranges):
+        self.twist.linear.x = 0
         self.still_turning = True
-        if self.moving_from_red[1] > 0 and self.moving_from_red[2] > 0:
-            self.twist.linear.x = 0
-            if self. moving_from_red[1] > self.moving_from_red[2]:
-                self.twist.angular.z = 1
-            else:
-                self.twist.angular.z = -1
-        elif self.moving_from_red[1] > 0 and self.moving_from_red[2] == 0:
-            self.twist.linear.x = 0.25
+        if self.moving_from_red[1] == "right":
             self.twist.angular.z = 1
-        elif self.moving_from_red[2] > 0 and self.moving_from_red[1] == 0:
-            self.twist.linear.x = 0.25
+        else:
             self.twist.angular.z = -1
         time.sleep(2)
 
@@ -185,8 +178,9 @@ class Follower:
         except CvBridgeError, e:
             print e
 
-        red_left = 0
-        red_right = 0
+        seen_red = False
+        red_dir = ""
+
         # crop image for red floor tiles
         dimensions = cv_image.shape
         height = cv_image.shape[0]
@@ -258,11 +252,8 @@ class Follower:
             if a > 1000.0:
                 cv2.drawContours(cv_image, c, -1, (0, 0, 255), 3)
                 print "i see red:", a,"%"
-                red_left = a
-                self.moving_from_red = [True,red_left,red_right]
-            else:
-                red_left = 0
-                self.moving_from_red = [False,red_left,red_right]
+                seen_red = True
+                red_dir = "left"
 
         for c in red_hsv_contours_right:
             a = cv2.contourArea(c)
@@ -270,11 +261,8 @@ class Follower:
             if a > 1000.0:
                 cv2.drawContours(cv_image, c, -1, (0, 0, 255), 3)
                 print "i see red:", a,"%"
-                red_right = a
-                self.moving_from_red = [True,red_left,red_right]
-            else:
-                red_right = 0
-                self.moving_from_red = [False,red_left,red_right]
+                seen_red = True
+                red_dir = "right"
 
         for c in green_hsv_contours:
             a = cv2.contourArea(c)
@@ -283,6 +271,7 @@ class Follower:
                 cv2.drawContours(cv_image, c, -1, (0, 255, 0), 3)
                 print "i see green:", a,"%"
 
+        self.moving_from_red = [seen_red,red_dir]
         cv2.imshow("Image window", cv_image)
         cv2.imshow("Cropped image window", cropped_cv_image_red_l)
         cv2.waitKey(1)
