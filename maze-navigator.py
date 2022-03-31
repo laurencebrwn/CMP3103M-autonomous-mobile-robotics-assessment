@@ -154,7 +154,7 @@ class Follower:
         return sum(middle)/len(middle)
 
 
-    def image_callback(self, msg):
+    def image_callback(self, data):
         cv2.namedWindow("Image window", 1)
         try:
             cv_image = self.bridge.imgmsg_to_cv2(data, "bgr8")
