@@ -160,23 +160,30 @@ class Follower:
         except CvBridgeError, e:
             print e
 
+        # crop image for floor tiles (green and red)
+        dimensions = cv_image.shape
+        height = cv_image.shape[0]
+        width = cv_image.shape[1]
+        cropped_cv_image = cv_image[0:(height///2), (width///3):((width/3)*2)]
+
         # create HSV colour space
         hsv_img = cv2.cvtColor(cv_image, cv2.COLOR_BGR2HSV)
+        cropped_hsv_img = cv2.cvtColor(cropped_cv_image, cv2.COLOR_BGR2HSV)
 
         # calculate colour thresholds
         blue_hsv_thresh = cv2.inRange(hsv_img,
                                  numpy.array((110, 50, 50)),
                                  numpy.array((130, 255, 255)))
 
-        red_hsv_thresh_1 = cv2.inRange(hsv_img,
+        red_hsv_thresh_1 = cv2.inRange(cropped_hsv_img,
                                 numpy.array((160, 50, 50)),
                                 numpy.array((180, 255, 255)))
-        red_hsv_thresh_2 = cv2.inRange(hsv_img,
+        red_hsv_thresh_2 = cv2.inRange(cropped_hsv_img,
                                 numpy.array((0, 50, 50)),
                                 numpy.array((20, 255, 255)))
         red_hsv_thresh = red_hsv_thresh_1 +red_hsv_thresh_2
 
-        green_hsv_thresh = cv2.inRange(hsv_img,
+        green_hsv_thresh = cv2.inRange(cropped_hsv_img,
                                numpy.array((50, 50, 50)),
                                numpy.array((70, 255, 255)))
 
