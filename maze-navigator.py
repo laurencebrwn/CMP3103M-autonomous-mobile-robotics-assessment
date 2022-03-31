@@ -36,11 +36,17 @@ class Follower:
         self.cmd_vel_pub.publish(self.twist)
 
     def red_movement(self, ranges):
-        self.twist.linear.x = 0
         self.still_turning = True
-        if self.moving_from_red[1] == "right":
+        if self.moving_from_red[1] > 0 and self.moving_from_red[2] > 0:
+            if self. moving_from_red[1] > self.moving_from_red[2]:
+                self.twist.angular.z = 1
+            else:
+                self.twist.angular.z = -1
+        elif self.moving_from_red[1] > 0 and self.moving_from_red[2] == 0:
+            self.twist.linear.x = 0.5
             self.twist.angular.z = 1
-        else:
+        elif self.moving_from_red[2] > 0 and self.moving_from_red[1] == 0:
+            self.twist.linear.x = 0.5
             self.twist.angular.z = -1
         time.sleep(2)
 
@@ -178,6 +184,8 @@ class Follower:
         except CvBridgeError, e:
             print e
 
+        red_left = 0
+        red_right = 0
         # crop image for red floor tiles
         dimensions = cv_image.shape
         height = cv_image.shape[0]
@@ -249,9 +257,11 @@ class Follower:
             if a > 1000.0:
                 cv2.drawContours(cv_image, c, -1, (0, 0, 255), 3)
                 print "i see red:", a,"%"
-                self.moving_from_red = [True,"left"]
+                red_left = a
+                self.moving_from_red = [True,red_left,red_right]
             else:
-                self.moving_from_red = [False,""]
+                red_left = 0
+                self.moving_from_red = [False,red_left,red_right]
 
         for c in red_hsv_contours_right:
             a = cv2.contourArea(c)
@@ -259,9 +269,11 @@ class Follower:
             if a > 1000.0:
                 cv2.drawContours(cv_image, c, -1, (0, 0, 255), 3)
                 print "i see red:", a,"%"
-                self.moving_from_red = [True,"right"]
+                red_right = a
+                self.moving_from_red = [True,red_left,red_right]
             else:
-                self.moving_from_red = [False,""]
+                red_right = 0
+                self.moving_from_red = [False,red_left,red_right]
 
         for c in green_hsv_contours:
             a = cv2.contourArea(c)
