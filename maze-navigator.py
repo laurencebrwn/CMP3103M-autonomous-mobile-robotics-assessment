@@ -247,7 +247,7 @@ class Follower:
             if a > 1000.0:
                 cv2.drawContours(cv_image, c, -1, (0, 0, 255), 3)
                 print "i see red:", a,"%"
-                self.moving_from_red = [True,"right"]
+                self.moving_from_red = [True,"left"]
             else:
                 self.moving_from_red = [False,""]
 
@@ -257,7 +257,7 @@ class Follower:
             if a > 1000.0:
                 cv2.drawContours(cv_image, c, -1, (0, 0, 255), 3)
                 print "i see red:", a,"%"
-                self.moving_from_red = [True,"left"]
+                self.moving_from_red = [True,"right"]
             else:
                 self.moving_from_red = [False,""]
 
