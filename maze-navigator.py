@@ -163,6 +163,7 @@ class Follower:
         # create HSV colour space
         hsv_img = cv2.cvtColor(cv_image, cv2.COLOR_BGR2HSV)
 
+        # calculate colour thresholds
         blue_hsv_thresh = cv2.inRange(hsv_img,
                                  numpy.array((110, 50, 50)),
                                  numpy.array((130, 255, 255)))
@@ -198,24 +199,24 @@ class Follower:
         # iterate over all those found contours and calculate area
         for c in blue_hsv_contours:
             a = cv2.contourArea(c)
-            # if the area is big enough, we draw the outline
+            # if the area is big enough draw  outline
             if a > 100.0:
                 cv2.drawContours(cv_image, c, -1, (255, 0, 0), 3)
-                print "i see blue"
+                print "i see blue:", a,"%"
 
         for c in red_hsv_contours:
             a = cv2.contourArea(c)
-            # if the area is big enough, we draw the outline
+            # if the area is big enough draw  outline
             if a > 100.0:
-                cv2.drawContours(cv_image, c, -1, (0, 255, 0), 3)
-                print "i see red"
+                cv2.drawContours(cv_image, c, -1, (0, 0, 255), 3)
+                print "i see red:", a,"%"
 
         for c in green_hsv_contours:
             a = cv2.contourArea(c)
-            # if the area is big enough, we draw the outline
+            # if the area is big enough draw  outline
             if a > 100.0:
-                cv2.drawContours(cv_image, c, -1, (0, 0, 255), 3)
-                print "i see green"
+                cv2.drawContours(cv_image, c, -1, (0, 255, 0), 3)
+                print "i see green:", a,"%"
 
         cv2.imshow("Image window", cv_image)
         cv2.waitKey(1)
