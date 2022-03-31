@@ -92,7 +92,7 @@ class Follower:
                     self.twist.angular.z = 0.5
                     self.prev_direction = 'right'
 
-        self.cmd_vel_pub.publish(self.twist)
+        #self.cmd_vel_pub.publish(self.twist)
 
     def laser_callback_left_right(self, msg):
         ranges = [x for x in msg.ranges if str(x) != 'nan']
