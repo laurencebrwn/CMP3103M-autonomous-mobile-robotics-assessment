@@ -38,15 +38,16 @@ class Follower:
     def red_movement(self, ranges):
         self.still_turning = True
         if self.moving_from_red[1] > 0 and self.moving_from_red[2] > 0:
+            self.twist.linear.x = 0
             if self. moving_from_red[1] > self.moving_from_red[2]:
                 self.twist.angular.z = 1
             else:
                 self.twist.angular.z = -1
         elif self.moving_from_red[1] > 0 and self.moving_from_red[2] == 0:
-            self.twist.linear.x = 0.5
+            self.twist.linear.x = 0.25
             self.twist.angular.z = 1
         elif self.moving_from_red[2] > 0 and self.moving_from_red[1] == 0:
-            self.twist.linear.x = 0.5
+            self.twist.linear.x = 0.25
             self.twist.angular.z = -1
         time.sleep(2)
 
