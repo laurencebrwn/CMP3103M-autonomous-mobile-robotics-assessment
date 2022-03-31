@@ -165,7 +165,7 @@ class Follower:
         dimensions = cv_image.shape
         height = cv_image.shape[0]
         width = cv_image.shape[1]
-        cropped_cv_image = cv_image[((height//20)*17):((height//10)*18), (width//5):((width//5)*4)]
+        cropped_cv_image = cv_image[((height//20)*17):((height//20)*18), (width//5):((width//5)*4)]
 
         # create HSV colour space
         hsv_img = cv2.cvtColor(cv_image, cv2.COLOR_BGR2HSV)
