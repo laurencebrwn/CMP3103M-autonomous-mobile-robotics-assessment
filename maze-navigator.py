@@ -31,7 +31,7 @@ class Follower:
         middle_dist = self.get_range_middle_dist(ranges)
         right_dist = self.get_range_right_dist(ranges)
         far_right_dist = self.get_range_far_right_dist(ranges)
-        min_dist = self.get_middle_min_dist(ranges)
+        min_dist = self.get_min_dist(ranges)
         distances = [far_left_dist, left_dist, middle_dist, right_dist, far_right_dist]
         if min_dist > 1:
             max_vel = 0.5
@@ -55,7 +55,7 @@ class Follower:
                 if 0 == max(range(len(distances)), key=distances.__getitem__):
                     print "moving hard left"
                     self.twist.linear.x = max_vel/2
-                    self.twist.angular.z = -0.5
+                    self.twist.angular.z = -0.75
 
                 elif 1 == max(range(len(distances)), key=distances.__getitem__):
                     print "moving left"
@@ -75,7 +75,7 @@ class Follower:
                 elif 4 == max(range(len(distances)), key=distances.__getitem__):
                     print "moving hard right"
                     self.twist.linear.x = max_vel/2
-                    self.twist.angular.z = 0.5
+                    self.twist.angular.z = 0.75
 
             else:
                 self.still_turning = True
@@ -146,9 +146,9 @@ class Follower:
         middle = ranges[((len(ranges) // 5)*2):((len(ranges) // 5)*3)]
         return sum(middle)/len(middle)
 
-    def get_middle_min_dist(self, ranges):
-        middle = ranges[(len(ranges) // 5):((len(ranges) // 5)*4)]
-        return min(middle)
+    def get_min_dist(self, ranges):
+        #middle = ranges[(len(ranges) // 5):((len(ranges) // 5)*4)]
+        return min(ranges)
 
     def image_callback(self, data):
         cv2.namedWindow("Image window", 1)
