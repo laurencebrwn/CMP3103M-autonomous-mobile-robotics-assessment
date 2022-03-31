@@ -18,14 +18,31 @@ class Follower:
     def __init__(self):
         self.bridge = cv_bridge.CvBridge()
         self.image_sub = rospy.Subscriber('/camera/rgb/image_raw', Image, self.image_callback)
-        #self.laser_sub = rospy.Subscriber('/scan', LaserScan, self.laser_callback_follow_open)
+        self.laser_sub = rospy.Subscriber('/scan', LaserScan, self.laser_callback_follow_open)
         self.cmd_vel_pub = rospy.Publisher('/mobile_base/commands/velocity', Twist, queue_size=1)
         self.twist = Twist()
         self.prev_direction = "left"
         self.still_turning = False
+        self.moving_from_red = [False,""]
 
     def laser_callback_follow_open(self, msg):
         ranges = [x for x in msg.ranges if str(x) != 'nan']
+
+        if self.moving_from_red[0] == True:
+            self.red_movement(ranges)
+        else:
+            self.normal_movement(ranges)
+
+        self.cmd_vel_pub.publish(self.twist)
+
+    def red_movement(self, ranges):
+        self.twist.linear.x = 0
+        if self.moving_from_red[1] == "right":
+            self.twist.angular.z = 1
+        else:
+            self.twist.angular.z = -1
+
+    def normal_movement(self, ranges):
         far_left_dist = self.get_range_far_left_dist(ranges)
         left_dist = self.get_range_left_dist(ranges)
         middle_dist = self.get_range_middle_dist(ranges)
@@ -91,8 +108,6 @@ class Follower:
                     print "turning right"
                     self.twist.angular.z = 0.5
                     self.prev_direction = 'right'
-
-        self.cmd_vel_pub.publish(self.twist)
 
     def laser_callback_left_right(self, msg):
         ranges = [x for x in msg.ranges if str(x) != 'nan']
@@ -161,30 +176,39 @@ class Follower:
         except CvBridgeError, e:
             print e
 
-        # crop image for floor tiles (green and red)
+        # crop image for red floor tiles
         dimensions = cv_image.shape
         height = cv_image.shape[0]
         width = cv_image.shape[1]
-        cropped_cv_image = cv_image[((height//20)*17):((height//20)*18), 0:width]
+        cropped_cv_image_red_l = cv_image[((height//20)*17):((height//20)*18), 0:(width//2)]
+        cropped_cv_image_red_r = cv_image[((height//20)*17):((height//20)*18), (width//2):width]
 
         # create HSV colour space
         hsv_img = cv2.cvtColor(cv_image, cv2.COLOR_BGR2HSV)
-        cropped_hsv_img = cv2.cvtColor(cropped_cv_image, cv2.COLOR_BGR2HSV)
+        cropped_hsv_img_red_l = cv2.cvtColor(cropped_cv_image_red_l, cv2.COLOR_BGR2HSV)
+        cropped_hsv_img_red_r = cv2.cvtColor(cropped_cv_image_red_r, cv2.COLOR_BGR2HSV)
 
         # calculate colour thresholds
         blue_hsv_thresh = cv2.inRange(hsv_img,
                                  numpy.array((110, 50, 50)),
                                  numpy.array((130, 255, 255)))
 
-        red_hsv_thresh_1 = cv2.inRange(cropped_hsv_img,
+        red_hsv_thresh_l1 = cv2.inRange(cropped_hsv_img_red_l,
                                 numpy.array((160, 50, 50)),
                                 numpy.array((180, 255, 255)))
-        red_hsv_thresh_2 = cv2.inRange(cropped_hsv_img,
+        red_hsv_thresh_l2 = cv2.inRange(cropped_hsv_img_red_l,
                                 numpy.array((0, 50, 50)),
                                 numpy.array((20, 255, 255)))
-        red_hsv_thresh = red_hsv_thresh_1 +red_hsv_thresh_2
+        red_hsv_thresh_r1 = cv2.inRange(cropped_hsv_img_red_r,
+                                numpy.array((160, 50, 50)),
+                                numpy.array((180, 255, 255)))
+        red_hsv_thresh_r2 = cv2.inRange(cropped_hsv_img_red_r,
+                                numpy.array((0, 50, 50)),
+                                numpy.array((20, 255, 255)))
+        red_hsv_thresh_left = red_hsv_thresh_l1 +red_hsv_thresh_l2
+        red_hsv_thresh_right = red_hsv_thresh_r1 +red_hsv_thresh_r2
 
-        green_hsv_thresh = cv2.inRange(cropped_hsv_img,
+        green_hsv_thresh = cv2.inRange(hsv_img,
                                numpy.array((50, 50, 50)),
                                numpy.array((70, 255, 255)))
 
@@ -194,12 +218,17 @@ class Follower:
             cv2.RETR_TREE,
             cv2.CHAIN_APPROX_SIMPLE)
 
-        _, red_hsv_contours, hierachy = cv2.findContours(
-            red_hsv_thresh.copy(),
+        _, red_hsv_contours_left, hierachy = cv2.findContours(
+            red_hsv_thresh_left.copy(),
             cv2.RETR_TREE,
             cv2.CHAIN_APPROX_SIMPLE)
 
-        _, green_hsv_contours, hierachy = cv2.findContours(
+        _, red_hsv_contours_right, hierachy = cv2.findContours(
+            red_hsv_thresh_right.copy(),
+            cv2.RETR_TREE,
+            cv2.CHAIN_APPROX_SIMPLE)
+
+        _, green_hsv_contours_right, hierachy = cv2.findContours(
             green_hsv_thresh.copy(),
             cv2.RETR_TREE,
             cv2.CHAIN_APPROX_SIMPLE)
@@ -212,17 +241,30 @@ class Follower:
                 cv2.drawContours(cv_image, c, -1, (255, 0, 0), 3)
                 print "i see blue:", a,"%"
 
-        for c in red_hsv_contours:
+        for c in red_hsv_contours_left:
             a = cv2.contourArea(c)
             # if the area is big enough draw  outline
-            if a > 100.0:
+            if a > 1000.0:
                 cv2.drawContours(cv_image, c, -1, (0, 0, 255), 3)
                 print "i see red:", a,"%"
+                self.moving_from_red = [True,"right"]
+            else:
+                self.moving_from_red = [False,""]
+
+        for c in red_hsv_contours_right:
+            a = cv2.contourArea(c)
+            # if the area is big enough draw  outline
+            if a > 1000.0:
+                cv2.drawContours(cv_image, c, -1, (0, 0, 255), 3)
+                print "i see red:", a,"%"
+                self.moving_from_red = [True,"left"]
+            else:
+                self.moving_from_red = [False,""]
 
         for c in green_hsv_contours:
             a = cv2.contourArea(c)
             # if the area is big enough draw  outline
-            if a > 100.0:
+            if a > 1000.0:
                 cv2.drawContours(cv_image, c, -1, (0, 255, 0), 3)
                 print "i see green:", a,"%"
 
