@@ -165,7 +165,7 @@ class Follower:
         dimensions = cv_image.shape
         height = cv_image.shape[0]
         width = cv_image.shape[1]
-        cropped_cv_image = cv_image[(height//2):height, (width//3):((width//3)*2)]
+        cropped_cv_image = cv_image[((height//3)*2):height, (width//5):((width//5)*4)]
 
         # create HSV colour space
         hsv_img = cv2.cvtColor(cv_image, cv2.COLOR_BGR2HSV)
@@ -215,14 +215,14 @@ class Follower:
         for c in red_hsv_contours:
             a = cv2.contourArea(c)
             # if the area is big enough draw  outline
-            if a > 100.0:
+            if a > 10000.0:
                 cv2.drawContours(cv_image, c, -1, (0, 0, 255), 3)
                 print "i see red:", a,"%"
 
         for c in green_hsv_contours:
             a = cv2.contourArea(c)
             # if the area is big enough draw  outline
-            if a > 100.0:
+            if a > 10000.0:
                 cv2.drawContours(cv_image, c, -1, (0, 255, 0), 3)
                 print "i see green:", a,"%"
 
