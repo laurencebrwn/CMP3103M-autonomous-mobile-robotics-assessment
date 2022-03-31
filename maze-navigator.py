@@ -164,16 +164,20 @@ class Follower:
         hsv_img = cv2.cvtColor(cv_image, cv2.COLOR_BGR2HSV)
 
         blue_hsv_thresh = cv2.inRange(hsv_img,
-                                 numpy.array((134, 60, 60)),
-                                 numpy.array((184, 255, 255)))
+                                 numpy.array((110, 50, 50)),
+                                 numpy.array((130, 255, 255)))
 
-        red_hsv_thresh = cv2.inRange(hsv_img,
-                                numpy.array((227, 60, 60)),
-                                numpy.array((21, 255, 255)))
+        red_hsv_thresh_1 = cv2.inRange(hsv_img,
+                                numpy.array((160, 50, 50)),
+                                numpy.array((180, 255, 255)))
+        red_hsv_thresh_2 = cv2.inRange(hsv_img,
+                                numpy.array((0, 50, 50)),
+                                numpy.array((20, 255, 255)))
+        red_hsv_thresh = red_hsv_thresh_1 +red_hsv_thresh_2
 
         green_hsv_thresh = cv2.inRange(hsv_img,
-                               numpy.array((53, 60, 60)),
-                               numpy.array((110, 255, 255)))
+                               numpy.array((50, 50, 50)),
+                               numpy.array((70, 255, 255)))
 
         # find the contours in the mask generated from the HSV image.
         _, blue_hsv_contours, hierachy = cv2.findContours(
