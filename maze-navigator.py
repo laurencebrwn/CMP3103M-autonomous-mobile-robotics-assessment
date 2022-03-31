@@ -26,16 +26,23 @@ class Follower:
 
     def laser_callback_follow_open(self, msg):
         ranges = [x for x in msg.ranges if str(x) != 'nan']
+        far_left_dist = self.get_range_far_left_dist(ranges)
         left_dist = self.get_range_left_dist(ranges)
         middle_dist = self.get_range_middle_dist(ranges)
         right_dist = self.get_range_right_dist(ranges)
-        min_dist = min(ranges)
+        far_right_dist = self.get_range_far_right_dist(ranges)
+        min_dist = self.get_middle_min_dist(ranges)
+        distances = [far_left_dist, left_dist, middle_dist, right_dist, far_right_dist]
+        if min_dist > 1:
+            max_vel = 0.5
+        else:
+            max_vel = 0.25
 
         if self.still_turning == True:
             print "still turning"
             print min_dist
             print self.prev_direction
-            if min_dist > 0.5:
+            if min_dist > 0.6:
                 self.twist.angular.z = 0
                 self.still_turning = False
                 time.sleep(1)
@@ -44,30 +51,41 @@ class Follower:
             elif self.prev_direction == 'left':
                 self.twist.angular.z = -0.5
         else:
-            if min_dist > 0.5:
-                if middle_dist > left_dist and middle_dist > right_dist:
-                    print "moving forward"
-                    self.twist.linear.x = 0.5
-                    self.twist.angular.z = 0
-                elif left_dist > middle_dist and left_dist > right_dist:
-                    print "moving left"
-                    self.twist.linear.x = 0.5
+            if min_dist > 0.6:
+                if 0 == min(range(len(distances)), key=distances.__getitem__):
+                    print "moving hard left"
+                    self.twist.linear.x = max_vel/2
                     self.twist.angular.z = -0.5
-                elif right_dist > middle_dist and right_dist > left_dist:
+
+                elif 1 == min(range(len(distances)), key=distances.__getitem__):
+                    print "moving left"
+                    self.twist.linear.x = max_vel
+                    self.twist.angular.z = -0.5
+
+                elif 2 == min(range(len(distances)), key=distances.__getitem__):
+                    print "moving forward"
+                    self.twist.linear.x = max_vel
+                    self.twist.angular.z = 0
+
+                elif 3 == min(range(len(distances)), key=distances.__getitem__):
                     print "moving right"
-                    self.twist.linear.x = 0.5
+                    self.twist.linear.x = max_vel
+                    self.twist.angular.z = 0.5
+
+                elif 4 == min(range(len(distances)), key=distances.__getitem__):
+                    print "moving hard right"
+                    self.twist.linear.x = max_vel/2
                     self.twist.angular.z = 0.5
 
             else:
                 self.still_turning = True
-                print "turning"
                 self.twist.linear.x = 0
-                if left_dist > right_dist:
-                    print "moving left"
+                if far_left_dist > far_right_dist:
+                    print "turning left"
                     self.twist.angular.z = -0.5
                     self.prev_direction = 'left'
                 else:
-                    print "moving right"
+                    print "turning right"
                     self.twist.angular.z = 0.5
                     self.prev_direction = 'right'
 
@@ -108,51 +126,29 @@ class Follower:
 
         self.cmd_vel_pub.publish(self.twist)
 
+    def get_range_far_left_dist(self, ranges):
+        left = ranges[0:(len(ranges)//5)]
+        return sum(left)/len(left)
+
     def get_range_left_dist(self, ranges):
-        # computing strt, and end index
-        strt_idx = 0
-        end_idx = len(ranges)//3
-
-        # using loop to get indices
-        left = []
-        for idx in range(len(ranges)):
-
-            # checking for elements in range
-            if idx >= strt_idx and idx <= end_idx:
-                left.append(ranges[idx])
-
+        left = ranges[(len(ranges)//5):((len(ranges)//5)*2)]
         return sum(left)/len(left)
 
     def get_range_right_dist(self, ranges):
-        # computing strt, and end index
-        strt_idx = (len(ranges) // 3)*2
-        end_idx = len(ranges)
+        right = ranges[((len(ranges) // 5)*3):((len(ranges) // 5)*4)]
+        return sum(right)/len(right)
 
-        # using loop to get indices
-        right = []
-        for idx in range(len(ranges)):
-
-            # checking for elements in range
-            if idx >= strt_idx and idx <= end_idx:
-                right.append(ranges[idx])
-
+    def get_range_far_right_dist(self, ranges):
+        right = ranges[((len(ranges) // 5)*4):(len(ranges))]
         return sum(right)/len(right)
 
     def get_range_middle_dist(self, ranges):
-        # computing strt, and end index
-        strt_idx = (len(ranges) // 3)
-        end_idx = (len(ranges) // 3)*2
-
-        # using loop to get indices
-        middle = []
-        for idx in range(len(ranges)):
-
-            # checking for elements in range
-            if idx >= strt_idx and idx <= end_idx:
-                middle.append(ranges[idx])
-
+        middle = ranges[((len(ranges) // 5)*2):((len(ranges) // 5)*3)]
         return sum(middle)/len(middle)
 
+    def get_middle_min_dist(self, ranges):
+        middle = ranges[(len(ranges) // 5):((len(ranges) // 5)*4)]
+        return min(middle)
 
     def image_callback(self, data):
         cv2.namedWindow("Image window", 1)
