@@ -155,6 +155,7 @@ class Follower:
 
     def image_callback(self, data):
         cv2.namedWindow("Image window", 1)
+        cv2.namedWindow("Cropped image window", 2)
         try:
             cv_image = self.bridge.imgmsg_to_cv2(data, "bgr8")
         except CvBridgeError, e:
@@ -226,6 +227,7 @@ class Follower:
                 print "i see green:", a,"%"
 
         cv2.imshow("Image window", cv_image)
+        cv2.imshow("Cropped image window", cropped_cv_image)
         cv2.waitKey(1)
 
 
