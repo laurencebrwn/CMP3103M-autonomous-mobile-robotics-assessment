@@ -164,15 +164,15 @@ class Follower:
         hsv_img = cv2.cvtColor(cv_image, cv2.COLOR_BGR2HSV)
 
         blue_hsv_thresh = cv2.inRange(hsv_img,
-                                 numpy.array((184, 122, 122)),
-                                 numpy.array((134, 255, 255)))
+                                 numpy.array((134, 60, 60)),
+                                 numpy.array((184, 255, 255)))
 
         red_hsv_thresh = cv2.inRange(hsv_img,
-                                numpy.array((21, 122, 122)),
-                                numpy.array((227, 255, 255)))
+                                numpy.array((227, 60, 60)),
+                                numpy.array((21, 255, 255)))
 
         green_hsv_thresh = cv2.inRange(hsv_img,
-                               numpy.array((53, 122, 122)),
+                               numpy.array((53, 60, 60)),
                                numpy.array((110, 255, 255)))
 
         # find the contours in the mask generated from the HSV image.
