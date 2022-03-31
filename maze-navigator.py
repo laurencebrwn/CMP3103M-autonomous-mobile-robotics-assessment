@@ -43,7 +43,7 @@ class Follower:
             print "still turning"
             print min_dist
             print self.prev_direction
-            if min_dist > 0.3:
+            if min_dist > 0.4:
                 self.twist.angular.z = 0
                 self.still_turning = False
                 time.sleep(1)
@@ -52,7 +52,7 @@ class Follower:
             elif self.prev_direction == 'left':
                 self.twist.angular.z = -1
         else:
-            if min_dist > 0.3:
+            if min_dist > 0.4:
                 print "furthest side", max(range(len(distances)), key=distances.__getitem__)
                 if 0 == max(range(len(distances)), key=distances.__getitem__):
                     print "moving hard left"
