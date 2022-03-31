@@ -33,6 +33,7 @@ class Follower:
         far_right_dist = self.get_range_far_right_dist(ranges)
         min_dist = self.get_min_dist(ranges)
         distances = [far_left_dist, left_dist, middle_dist, right_dist, far_right_dist]
+        print "min dist", min_dist
         if min_dist > 1:
             max_vel = 0.5
         else:
@@ -52,6 +53,7 @@ class Follower:
                 self.twist.angular.z = -1
         else:
             if min_dist > 0.3:
+                print "furthest side", max(range(len(distances)), key=distances.__getitem__)
                 if 0 == max(range(len(distances)), key=distances.__getitem__):
                     print "moving hard left"
                     self.twist.linear.x = max_vel/2
