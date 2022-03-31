@@ -18,7 +18,7 @@ class Follower:
     def __init__(self):
         self.bridge = cv_bridge.CvBridge()
         self.image_sub = rospy.Subscriber('/camera/rgb/image_raw', Image, self.image_callback)
-        self.laser_sub = rospy.Subscriber('/scan', LaserScan, self.laser_callback_follow_open)
+        #self.laser_sub = rospy.Subscriber('/scan', LaserScan, self.laser_callback_follow_open)
         self.cmd_vel_pub = rospy.Publisher('/mobile_base/commands/velocity', Twist, queue_size=1)
         self.twist = Twist()
         self.prev_direction = "left"
@@ -92,7 +92,7 @@ class Follower:
                     self.twist.angular.z = 0.5
                     self.prev_direction = 'right'
 
-        #self.cmd_vel_pub.publish(self.twist)
+        self.cmd_vel_pub.publish(self.twist)
 
     def laser_callback_left_right(self, msg):
         ranges = [x for x in msg.ranges if str(x) != 'nan']
