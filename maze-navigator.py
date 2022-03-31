@@ -42,6 +42,7 @@ class Follower:
             self.twist.angular.z = 1
         else:
             self.twist.angular.z = -1
+        time.sleep(1)
 
     def normal_movement(self, ranges):
         far_left_dist = self.get_range_far_left_dist(ranges)
