@@ -269,7 +269,7 @@ class Follower:
                 print "i see green:", a,"%"
 
         cv2.imshow("Image window", cv_image)
-        cv2.imshow("Cropped image window", cropped_cv_image)
+        cv2.imshow("Cropped image window", cropped_cv_image_red_l)
         cv2.waitKey(1)
 
 
