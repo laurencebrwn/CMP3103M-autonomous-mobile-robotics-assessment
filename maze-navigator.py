@@ -52,27 +52,27 @@ class Follower:
                 self.twist.angular.z = -0.5
         else:
             if min_dist > 0.6:
-                if 0 == min(range(len(distances)), key=distances.__getitem__):
+                if 0 == max(range(len(distances)), key=distances.__getitem__):
                     print "moving hard left"
                     self.twist.linear.x = max_vel/2
                     self.twist.angular.z = -0.5
 
-                elif 1 == min(range(len(distances)), key=distances.__getitem__):
+                elif 1 == max(range(len(distances)), key=distances.__getitem__):
                     print "moving left"
                     self.twist.linear.x = max_vel
                     self.twist.angular.z = -0.5
 
-                elif 2 == min(range(len(distances)), key=distances.__getitem__):
+                elif 2 == max(range(len(distances)), key=distances.__getitem__):
                     print "moving forward"
                     self.twist.linear.x = max_vel
                     self.twist.angular.z = 0
 
-                elif 3 == min(range(len(distances)), key=distances.__getitem__):
+                elif 3 == max(range(len(distances)), key=distances.__getitem__):
                     print "moving right"
                     self.twist.linear.x = max_vel
                     self.twist.angular.z = 0.5
 
-                elif 4 == min(range(len(distances)), key=distances.__getitem__):
+                elif 4 == max(range(len(distances)), key=distances.__getitem__):
                     print "moving hard right"
                     self.twist.linear.x = max_vel/2
                     self.twist.angular.z = 0.5
