@@ -155,7 +155,7 @@ class Follower:
 
 
     def image_callback(self, msg):
-                cv2.namedWindow("Image window", 1)
+        cv2.namedWindow("Image window", 1)
         try:
             cv_image = self.bridge.imgmsg_to_cv2(data, "bgr8")
         except CvBridgeError, e:
