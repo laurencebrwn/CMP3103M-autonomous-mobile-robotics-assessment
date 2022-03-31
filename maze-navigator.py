@@ -38,12 +38,11 @@ class Follower:
     def red_movement(self, ranges):
         self.twist.linear.x = 0
         self.still_turning = True
-        self.twist.linear.x = -0.5
         if self.moving_from_red[1] == "right":
             self.twist.angular.z = 1
         else:
             self.twist.angular.z = -1
-        time.sleep(1)
+        time.sleep(2)
 
     def normal_movement(self, ranges):
         far_left_dist = self.get_range_far_left_dist(ranges)
