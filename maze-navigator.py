@@ -228,7 +228,7 @@ class Follower:
             cv2.RETR_TREE,
             cv2.CHAIN_APPROX_SIMPLE)
 
-        _, green_hsv_contours_right, hierachy = cv2.findContours(
+        _, green_hsv_contours, hierachy = cv2.findContours(
             green_hsv_thresh.copy(),
             cv2.RETR_TREE,
             cv2.CHAIN_APPROX_SIMPLE)
