@@ -163,27 +163,56 @@ class Follower:
         # create HSV colour space
         hsv_img = cv2.cvtColor(cv_image, cv2.COLOR_BGR2HSV)
 
-        hsv_thresh = cv2.inRange(hsv_img,
-                                 numpy.array((0, 150, 50)),
-                                 numpy.array((255, 255, 255)))
+        blue_hsv_thresh = cv2.inRange(hsv_img,
+                                 numpy.array((184, 122, 122)),
+                                 numpy.array((134, 255, 255)))
+
+        red_hsv_thresh = cv2.inRange(hsv_img,
+                                numpy.array((21, 122, 122)),
+                                numpy.array((227, 255, 255)))
+
+        green_hsv_thresh = cv2.inRange(hsv_img,
+                               numpy.array((53, 122, 122)),
+                               numpy.array((110, 255, 255)))
 
         # find the contours in the mask generated from the HSV image.
-        _, hsv_contours, hierachy = cv2.findContours(
-            hsv_thresh.copy(),
+        _, blue_hsv_contours, hierachy = cv2.findContours(
+            blue_hsv_thresh.copy(),
             cv2.RETR_TREE,
             cv2.CHAIN_APPROX_SIMPLE)
 
-        # in hsv_contours we now have an array of individual
-        # closed contours (basically a polgon around the
-        # blobs in the mask). Let's iterate over all those found
-        # contours.
-        for c in hsv_contours:
-            # This allows to compute the area (in pixels) of a contour
+        _, red_hsv_contours, hierachy = cv2.findContours(
+            red_hsv_thresh.copy(),
+            cv2.RETR_TREE,
+            cv2.CHAIN_APPROX_SIMPLE)
+
+        _, green_hsv_contours, hierachy = cv2.findContours(
+            green_hsv_thresh.copy(),
+            cv2.RETR_TREE,
+            cv2.CHAIN_APPROX_SIMPLE)
+
+        # iterate over all those found contours and calculate area
+        for c in blue_hsv_contours:
             a = cv2.contourArea(c)
-            # and if the area is big enough, we draw the outline
-            # of the contour (in blue)
+            # if the area is big enough, we draw the outline
             if a > 100.0:
                 cv2.drawContours(cv_image, c, -1, (255, 0, 0), 3)
+                print "i see blue"
+
+        for c in red_hsv_contours:
+            a = cv2.contourArea(c)
+            # if the area is big enough, we draw the outline
+            if a > 100.0:
+                cv2.drawContours(cv_image, c, -1, (0, 255, 0), 3)
+                print "i see red"
+
+        for c in green_hsv_contours:
+            a = cv2.contourArea(c)
+            # if the area is big enough, we draw the outline
+            if a > 100.0:
+                cv2.drawContours(cv_image, c, -1, (0, 0, 255), 3)
+                print "i see green"
+
         cv2.imshow("Image window", cv_image)
         cv2.waitKey(1)
 
