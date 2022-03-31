@@ -215,14 +215,14 @@ class Follower:
         for c in red_hsv_contours:
             a = cv2.contourArea(c)
             # if the area is big enough draw  outline
-            if a > 10000.0:
+            if a > 100.0:
                 cv2.drawContours(cv_image, c, -1, (0, 0, 255), 3)
                 print "i see red:", a,"%"
 
         for c in green_hsv_contours:
             a = cv2.contourArea(c)
             # if the area is big enough draw  outline
-            if a > 10000.0:
+            if a > 100.0:
                 cv2.drawContours(cv_image, c, -1, (0, 255, 0), 3)
                 print "i see green:", a,"%"
 
