@@ -1,4 +1,6 @@
 #!/usr/bin/env python
+# run: roslaunch uol_turtlebot_simulator maze1.launch
+# then run this py file
 
 import numpy
 
@@ -6,7 +8,7 @@ import cv2
 import cv_bridge
 import rospy
 import time
-
+from cv_bridge import CvBridgeError
 from sensor_msgs.msg import Image
 from sensor_msgs.msg import LaserScan
 from geometry_msgs.msg import Twist
@@ -15,7 +17,7 @@ from geometry_msgs.msg import Twist
 class Follower:
     def __init__(self):
         self.bridge = cv_bridge.CvBridge()
-        #self.image_sub = rospy.Subscriber('/camera/rgb/image_raw', Image, self.image_callback)
+        self.image_sub = rospy.Subscriber('/camera/rgb/image_raw', Image, self.image_callback)
         self.laser_sub = rospy.Subscriber('/scan', LaserScan, self.laser_callback_follow_open)
         self.cmd_vel_pub = rospy.Publisher('/mobile_base/commands/velocity', Twist, queue_size=1)
         self.twist = Twist()
@@ -153,30 +155,38 @@ class Follower:
 
 
     def image_callback(self, msg):
-        cv2.namedWindow("window", 1)
-        image = self.bridge.imgmsg_to_cv2(msg, desired_encoding='bgr8')
-        hsv = cv2.cvtColor(image, cv2.COLOR_BGR2HSV)
-        lower_yellow = numpy.array([10, 10, 10])
-        upper_yellow = numpy.array([255, 255, 250])
-        mask = cv2.inRange(hsv, lower_yellow, upper_yellow)
-        h, w, d = image.shape
-        search_top = 3*h/4
-        search_bot = 3*h/4 + 20
-        mask[0:search_top, 0:w] = 0
-        mask[search_bot:h, 0:w] = 0
-        M = cv2.moments(mask)
-        if M['m00'] > 0:
-            cx = int(M['m10']/M['m00'])
-            cy = int(M['m01']/M['m00'])
-            cv2.circle(image, (cx, cy), 20, (0, 0, 255), -1)
-            err = cx - w/2
-            self.twist.linear.x = 0.2
-            self.twist.angular.z = -float(err) / 100
-            print self.twist.angular.z
+                cv2.namedWindow("Image window", 1)
+        try:
+            cv_image = self.bridge.imgmsg_to_cv2(data, "bgr8")
+        except CvBridgeError, e:
+            print e
 
-            self.cmd_vel_pub.publish(self.twist)
-        cv2.imshow("window", image)
-        cv2.waitKey(3)
+        # create HSV colour space
+        hsv_img = cv2.cvtColor(cv_image, cv2.COLOR_BGR2HSV)
+
+        hsv_thresh = cv2.inRange(hsv_img,
+                                 numpy.array((0, 150, 50)),
+                                 numpy.array((255, 255, 255)))
+
+        # find the contours in the mask generated from the HSV image.
+        _, hsv_contours, hierachy = cv2.findContours(
+            hsv_thresh.copy(),
+            cv2.RETR_TREE,
+            cv2.CHAIN_APPROX_SIMPLE)
+
+        # in hsv_contours we now have an array of individual
+        # closed contours (basically a polgon around the
+        # blobs in the mask). Let's iterate over all those found
+        # contours.
+        for c in hsv_contours:
+            # This allows to compute the area (in pixels) of a contour
+            a = cv2.contourArea(c)
+            # and if the area is big enough, we draw the outline
+            # of the contour (in blue)
+            if a > 100.0:
+                cv2.drawContours(cv_image, c, -1, (255, 0, 0), 3)
+        cv2.imshow("Image window", cv_image)
+        cv2.waitKey(1)
 
 
 #cv2.startWindowThread()

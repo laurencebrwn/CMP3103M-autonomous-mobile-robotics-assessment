@@ -1,0 +1,13 @@
+version: '3'
+services:
+  novnc_desktop_bionic:
+    image: lcas.lincoln.ac.uk/lcas/novnc-desktop-standalone:bionic
+    ports:
+      - 6080:6080
+    restart: always
+    volumes:
+      - userhome:/home/lcas
+    cap_add:
+    - SYS_ADMIN
+volumes:
+  userhome:
