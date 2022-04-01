@@ -106,6 +106,8 @@ class Follower:
             if min_dist > 0.8:
                 self.twist.angular.z = 0
                 self.still_turning = False
+            elif min_dist < 0.3:
+                self.twist.linear.x = -0.25
             elif self.prev_direction == 'right':
                 self.twist.angular.z = -1
             elif self.prev_direction == 'left':
@@ -125,12 +127,7 @@ class Follower:
                         self.twist.angular.z = -0.5
                         self.prev_direction = 'right'
 
-                elif 2 == max(range(len(distances)), key=distances.__getitem__) or middle_dist > 1 :
-                    print "moving forward"
-                    self.twist.linear.x = max_vel
-                    self.twist.angular.z = 0
-
-                elif 0 == max(range(len(distances)), key=distances.__getitem__) or 4 == min(range(len(distances)), key=distances.__getitem__):
+                elif 0 == max(range(len(distances)), key=distances.__getitem__) and far_left_dist > (middle_dist*1.5):
                     print "moving hard left"
                     self.twist.linear.x = max_vel/2
                     self.twist.angular.z = 0.75
@@ -142,13 +139,18 @@ class Follower:
                     self.twist.angular.z = 0.5
                     self.prev_direction = 'left'
 
+                elif 2 == max(range(len(distances)), key=distances.__getitem__):
+                    print "moving forward"
+                    self.twist.linear.x = max_vel
+                    self.twist.angular.z = 0
+
                 elif 3 == max(range(len(distances)), key=distances.__getitem__):
                     print "moving right"
                     self.twist.linear.x = max_vel
                     self.twist.angular.z = -0.5
                     self.prev_direction = 'right'
 
-                elif 4 == max(range(len(distances)), key=distances.__getitem__) or 0 == min(range(len(distances)), key=distances.__getitem__):
+                elif 4 == max(range(len(distances)), key=distances.__getitem__) and far_right_dist > (middle_dist*1.5):
                     print "moving hard right"
                     self.twist.linear.x = max_vel/2
                     self.twist.angular.z = -0.75
