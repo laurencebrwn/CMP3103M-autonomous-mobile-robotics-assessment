@@ -211,10 +211,10 @@ class Follower:
 
         # calculate colour thresholds
         blue_hsv_thresh_left = cv2.inRange(cropped_hsv_img_l,
-                                 numpy.array((110, 150, 50)),
+                                 numpy.array((110, 50, 50)),
                                  numpy.array((130, 255, 255)))
         blue_hsv_thresh_right = cv2.inRange(cropped_hsv_img_r,
-                                 numpy.array((110, 150, 50)),
+                                 numpy.array((110, 50, 50)),
                                  numpy.array((130, 255, 255)))
 
         red_hsv_thresh_l1 = cv2.inRange(cropped_hsv_img_red_l,
@@ -322,7 +322,7 @@ class Follower:
             # if the area is big enough draw  outline
             if a > 100.0:
                 cv2.drawContours(cv_image, c, -1, (255, 0, 0), 3)
-                print "i see blue:", a,"%"
+                print "i see green:", a,"%"
                 seen_green = True
                 if green_dir == "left":
                     green_dir = "forward"
