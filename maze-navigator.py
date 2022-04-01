@@ -58,11 +58,13 @@ class Follower:
         if self.moving_to_green[1] == "both":
             self.normal_movement(ranges)
         elif self.moving_to_green[1] == "right":
-            self.twist.linear.x = 0
+            self.twist.linear.x = 0.25
             self.twist.angular.z = 1
+            self.prev_direction = 'left'
         else:
-            self.twist.linear.x = 0
+            self.twist.linear.x = 0.25
             self.twist.angular.z = -1
+            self.prev_direction = 'right'
 
     def blue_movement(self, ranges):
         min_middle_dist = self.get_min_middle_dist(ranges)
@@ -70,11 +72,13 @@ class Follower:
             if self.moving_to_blue[1] == "both":
                 self.normal_movement(ranges)
             elif self.moving_to_blue[1] == "right":
-                self.twist.linear.x = 0
+                self.twist.linear.x = 0.25
                 self.twist.angular.z = 1
+                self.prev_direction = 'right'
             else:
-                self.twist.linear.x = 0
+                self.twist.linear.x = 0.25
                 self.twist.angular.z = -1
+                self.prev_direction = 'left'
 
     def normal_movement(self, ranges):
         far_left_dist = self.get_range_far_left_dist(ranges)
