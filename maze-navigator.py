@@ -35,17 +35,17 @@ class Follower:
         if self.finished == False:
             if self.moving_from_red[0] == True:
                 self.red_movement(ranges)
+            elif self.green_close == True:
+                self.finished = True
+                self.twist.linear.x = 0
+                self.twist.angular.z = 0
+                print "finished"
             elif self.moving_to_green[0] == True:
                 self.green_movement(ranges)
             elif self.moving_to_blue[0] == True and self.final_route_stated == False:
                 self.blue_movement(ranges)
             elif self.green_close == False:
                 self.normal_movement(ranges)
-            elif self.green_close == True:
-                self.finished = True
-                self.twist.linear.x = 0
-                self.twist.angular.z = 0
-                print "finished"
 
             self.cmd_vel_pub.publish(self.twist)
 
