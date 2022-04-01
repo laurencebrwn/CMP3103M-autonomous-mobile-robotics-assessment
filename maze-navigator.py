@@ -49,9 +49,10 @@ class Follower:
         self.still_turning = True
         if self.moving_from_red[1] == "right":
             self.twist.angular.z = -1
+            self.prev_direction = 'right'
         else:
             self.twist.angular.z = 1
-        time.sleep(2)
+            self.prev_direction = 'left'
 
     def moving_to_green(self, ranges):
         self.final_route_stated = True
