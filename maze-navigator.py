@@ -67,8 +67,8 @@ class Follower:
             self.prev_direction = 'right'
 
     def blue_movement(self, ranges):
-        min_middle_dist = self.get_min_middle_dist(ranges)
-        if min_middle_dist < 0.4 or self.moving_to_blue[1] == "both":
+        min_dist = min(ranges)
+        if min_dist < 0.4 or self.moving_to_blue[1] == "both":
             self.normal_movement(ranges)
         elif self.moving_to_blue[1] == "right":
             self.twist.linear.x = 0.25
