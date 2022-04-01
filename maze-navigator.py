@@ -124,7 +124,7 @@ class Follower:
                         print "turning right"
                         self.twist.angular.z = -0.5
                         self.prev_direction = 'right'
-                if 0 == max(range(len(distances)), key=distances.__getitem__) or 4 == min(range(len(distances)), key=distances.__getitem__):
+                elif 0 == max(range(len(distances)), key=distances.__getitem__) or 4 == min(range(len(distances)), key=distances.__getitem__):
                     print "moving hard left"
                     self.twist.linear.x = max_vel/2
                     self.twist.angular.z = 0.75
