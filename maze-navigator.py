@@ -31,7 +31,7 @@ class Follower:
 
     def laser_callback_follow_open(self, msg):
         ranges = [x for x in msg.ranges if str(x) != 'nan']
-        if self.finishd == False:
+        if self.finished == False:
             if self.moving_from_red[0] == True:
                 self.red_movement(ranges)
             elif self.moving_to_green[0] == True:
