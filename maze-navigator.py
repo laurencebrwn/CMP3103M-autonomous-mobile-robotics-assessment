@@ -35,7 +35,7 @@ class Follower:
         if self.finished == False:
             if self.moving_from_red[0] == True:
                 self.red_movement(ranges)
-            elif self.green_close == True and moving_to_green[0] == False:
+            elif self.green_close == True and self.moving_to_green[0] == False:
                 self.finished = True
                 self.twist.linear.x = 0
                 self.twist.angular.z = 0
