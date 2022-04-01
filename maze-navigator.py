@@ -40,7 +40,9 @@ class Follower:
         elif self.final_route_stated == False:
             self.normal_movement(ranges)
         else:
-            print "finished"
+            self.twist.linear.x = 0
+            self.twist.angular.z = 0
+            pint "finished"
 
         self.cmd_vel_pub.publish(self.twist)
 
@@ -207,10 +209,10 @@ class Follower:
 
         # calculate colour thresholds
         blue_hsv_thresh_left = cv2.inRange(cropped_hsv_img_l,
-                                 numpy.array((110, 50, 50)),
+                                 numpy.array((110, 80, 80)),
                                  numpy.array((130, 255, 255)))
         blue_hsv_thresh_right = cv2.inRange(cropped_hsv_img_r,
-                                 numpy.array((110, 50, 50)),
+                                 numpy.array((110, 80, 80)),
                                  numpy.array((130, 255, 255)))
 
         red_hsv_thresh_l1 = cv2.inRange(cropped_hsv_img_red_l,
