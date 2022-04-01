@@ -48,9 +48,9 @@ class Follower:
         self.twist.linear.x = 0
         self.still_turning = True
         if self.moving_from_red[1] == "right":
-            self.twist.angular.z = 1
-        else:
             self.twist.angular.z = -1
+        else:
+            self.twist.angular.z = 1
         time.sleep(2)
 
     def moving_to_green(self, ranges):
@@ -59,11 +59,11 @@ class Follower:
             self.normal_movement(ranges)
         elif self.moving_to_green[1] == "right":
             self.twist.linear.x = 0.25
-            self.twist.angular.z = 1
+            self.twist.angular.z = -1
             self.prev_direction = 'left'
         else:
             self.twist.linear.x = 0.25
-            self.twist.angular.z = -1
+            self.twist.angular.z = 1
             self.prev_direction = 'right'
 
     def blue_movement(self, ranges):
@@ -73,11 +73,11 @@ class Follower:
                 self.normal_movement(ranges)
             elif self.moving_to_blue[1] == "right":
                 self.twist.linear.x = 0.25
-                self.twist.angular.z = 1
+                self.twist.angular.z = -1
                 self.prev_direction = 'right'
             else:
                 self.twist.linear.x = 0.25
-                self.twist.angular.z = -1
+                self.twist.angular.z = 1
                 self.prev_direction = 'left'
 
     def normal_movement(self, ranges):
@@ -104,21 +104,21 @@ class Follower:
                 self.still_turning = False
                 time.sleep(1)
             elif self.prev_direction == 'right':
-                self.twist.angular.z = 1
-            elif self.prev_direction == 'left':
                 self.twist.angular.z = -1
+            elif self.prev_direction == 'left':
+                self.twist.angular.z = 1
         else:
             if min_dist > 0.4:
                 print "furthest side", max(range(len(distances)), key=distances.__getitem__)
                 if 0 == max(range(len(distances)), key=distances.__getitem__) or 4 == min(range(len(distances)), key=distances.__getitem__):
                     print "moving hard left"
                     self.twist.linear.x = max_vel/2
-                    self.twist.angular.z = -0.75
+                    self.twist.angular.z = 0.75
 
                 elif 1 == max(range(len(distances)), key=distances.__getitem__):
                     print "moving left"
                     self.twist.linear.x = max_vel
-                    self.twist.angular.z = -0.5
+                    self.twist.angular.z = 0.5
 
                 elif 2 == max(range(len(distances)), key=distances.__getitem__):
                     print "moving forward"
@@ -128,23 +128,23 @@ class Follower:
                 elif 3 == max(range(len(distances)), key=distances.__getitem__):
                     print "moving right"
                     self.twist.linear.x = max_vel
-                    self.twist.angular.z = 0.5
+                    self.twist.angular.z = -0.5
 
                 elif 4 == max(range(len(distances)), key=distances.__getitem__) or 0 == min(range(len(distances)), key=distances.__getitem__):
                     print "moving hard right"
                     self.twist.linear.x = max_vel/2
-                    self.twist.angular.z = 0.75
+                    self.twist.angular.z = -0.75
 
             else:
                 self.still_turning = True
                 self.twist.linear.x = 0
                 if (far_left_dist + left_dist)/2 > (far_right_dist + right_dist)/2:
                     print "turning left"
-                    self.twist.angular.z = -0.5
+                    self.twist.angular.z = 0.5
                     self.prev_direction = 'left'
                 else:
                     print "turning right"
-                    self.twist.angular.z = 0.5
+                    self.twist.angular.z = -0.5
                     self.prev_direction = 'right'
 
     def get_range_far_left_dist(self, ranges):
