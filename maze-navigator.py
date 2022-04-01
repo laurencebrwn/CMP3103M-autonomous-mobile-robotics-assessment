@@ -106,13 +106,24 @@ class Follower:
             if min_dist > 0.4:
                 self.twist.angular.z = 0
                 self.still_turning = False
-                time.sleep(1)
             elif self.prev_direction == 'right':
                 self.twist.angular.z = -1
             elif self.prev_direction == 'left':
                 self.twist.angular.z = 1
         else:
-            if min_dist > 0.4 and min_dist < 0.8 and middle_dist > left_dist and middle_dist > right_dist:
+            if min_dist > 0.4:
+                if min_dist < 0.8 and middle_dist > left_dist and middle_dist > right_dist:
+                    print "stuck in corner"
+                    self.still_turning = True
+                    self.twist.linear.x = 0
+                    if (far_left_dist + left_dist)/2 > (far_right_dist + right_dist)/2:
+                        print "turning left"
+                        self.twist.angular.z = 0.5
+                        self.prev_direction = 'left'
+                    else:
+                        print "turning right"
+                        self.twist.angular.z = -0.5
+                        self.prev_direction = 'right'
                 if 0 == max(range(len(distances)), key=distances.__getitem__) or 4 == min(range(len(distances)), key=distances.__getitem__):
                     print "moving hard left"
                     self.twist.linear.x = max_vel/2
@@ -139,8 +150,6 @@ class Follower:
                     self.twist.angular.z = -0.75
 
             else:
-                if min_dist < 0.8 and middle_dist > left_dist and middle_dist > right_dist:
-                    print "stuck in corner"
                 self.still_turning = True
                 self.twist.linear.x = 0
                 if (far_left_dist + left_dist)/2 > (far_right_dist + right_dist)/2:
