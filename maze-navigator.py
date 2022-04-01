@@ -60,6 +60,7 @@ class Follower:
             self.prev_direction = 'right'
 
     def green_movement(self, ranges):
+        min_dist = min(ranges)
         self.final_route_stated = True
         if min_dist > 0.4:
             if self.moving_to_green[1] == "both":
