@@ -48,11 +48,11 @@ class Follower:
         self.twist.linear.x = 0
         self.still_turning = True
         if self.moving_from_red[1] == "right":
-            self.twist.angular.z = -1
-            self.prev_direction = 'right'
-        else:
             self.twist.angular.z = 1
             self.prev_direction = 'left'
+        else:
+            self.twist.angular.z = -1
+            self.prev_direction = 'right'
 
     def moving_to_green(self, ranges):
         self.final_route_stated = True
@@ -61,11 +61,11 @@ class Follower:
         elif self.moving_to_green[1] == "right":
             self.twist.linear.x = 0.25
             self.twist.angular.z = -1
-            self.prev_direction = 'left'
+            self.prev_direction = 'right'
         else:
             self.twist.linear.x = 0.25
             self.twist.angular.z = 1
-            self.prev_direction = 'right'
+            self.prev_direction = 'left'
 
     def blue_movement(self, ranges):
         min_dist = min(ranges)
