@@ -36,7 +36,7 @@ class Follower:
                 self.red_movement(ranges)
             elif self.moving_to_green[0] == True:
                 self.green_movement(ranges)
-            elif self.moving_to_blue[0] == True and self.final_route_stated = False:
+            elif self.moving_to_blue[0] == True and self.final_route_stated == False:
                 self.blue_movement(ranges)
             elif self.final_route_stated == False:
                 self.normal_movement(ranges)
