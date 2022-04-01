@@ -112,7 +112,7 @@ class Follower:
                 self.twist.angular.z = 1
         else:
             if min_dist > 0.4:
-                if min_dist < 0.8 and middle_dist > left_dist and middle_dist > right_dist:
+                if middle_dist < 0.8 and middle_dist > left_dist and middle_dist > right_dist:
                     print "stuck in corner"
                     self.still_turning = True
                     self.twist.linear.x = 0
