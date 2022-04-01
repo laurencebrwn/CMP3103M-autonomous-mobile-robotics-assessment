@@ -24,14 +24,23 @@ class Follower:
         self.prev_direction = "left"
         self.still_turning = False
         self.moving_from_red = [False,""]
+        self.moving_to_green = [False,""]
+        self.moving_to_blue = [False,""]
+        self.final_route_stated = False
 
     def laser_callback_follow_open(self, msg):
         ranges = [x for x in msg.ranges if str(x) != 'nan']
 
         if self.moving_from_red[0] == True:
             self.red_movement(ranges)
-        else:
+        elif self.moving_to_green[0] == True:
+            self.green_movement(ranges)
+        elif self.moving_to_blue[0] == True:
+            self.blue_movement(ranges)
+        elif self.final_route_stated == False:
             self.normal_movement(ranges)
+        else:
+            print "finished"
 
         self.cmd_vel_pub.publish(self.twist)
 
@@ -43,6 +52,29 @@ class Follower:
         else:
             self.twist.angular.z = -1
         time.sleep(2)
+
+    def moving_to_green(self, ranges):
+        self.final_route_stated = True
+        if self.moving_to_green[1] == "both":
+            self.normal_movement(ranges)
+        elif self.moving_to_green[1] == "right":
+            self.twist.linear.x = 0
+            self.twist.angular.z = 1
+        else:
+            self.twist.linear.x = 0
+            self.twist.angular.z = -1
+
+    def moving_to_blue(self, ranges):
+        min_middle_dist = self.get_min_middle_dist(ranges)
+        if min_middle_dist > 0.4:
+            if self.moving_to_blue[1] == "both":
+                self.normal_movement(ranges)
+            elif self.moving_to_blue[1] == "right":
+                self.twist.linear.x = 0
+                self.twist.angular.z = 1
+            else:
+                self.twist.linear.x = 0
+                self.twist.angular.z = -1
 
     def normal_movement(self, ranges):
         far_left_dist = self.get_range_far_left_dist(ranges)
@@ -111,41 +143,6 @@ class Follower:
                     self.twist.angular.z = 0.5
                     self.prev_direction = 'right'
 
-    def laser_callback_left_right(self, msg):
-        ranges = [x for x in msg.ranges if str(x) != 'nan']
-        dist = self.get_range_middle_dist(ranges)
-        if self.still_turning == True:
-            print "still turning"
-            print dist
-            print self.prev_direction
-            if dist > 0.65:
-                self.twist.angular.z = 0
-                self.still_turning = False
-                time.sleep(1)
-            elif self.prev_direction == 'right':
-                self.twist.angular.z = 1.5
-            elif self.prev_direction == 'left':
-                self.twist.angular.z = -1.5
-
-        else:
-            if dist > 0.65:
-                print "moving"
-                self.twist.linear.x = 0.5
-                self.twist.angular.z = 0
-
-            else:
-                self.still_turning = True
-                print "turning"
-                self.twist.linear.x = 0
-                if self.prev_direction == 'left':
-                    self.twist.angular.z = 1.5
-                    self.prev_direction = 'right'
-                else:
-                    self.twist.angular.z = -1.5
-                    self.prev_direction = 'left'
-
-        self.cmd_vel_pub.publish(self.twist)
-
     def get_range_far_left_dist(self, ranges):
         left = ranges[0:(len(ranges)//5)]
         return sum(left)/len(left)
@@ -180,6 +177,10 @@ class Follower:
 
         seen_red = False
         red_dir = ""
+        seen_blue = False
+        blue_dir = ""
+        seen_green = False
+        green_dir = ""
 
         # crop image for red floor tiles
         dimensions = cv_image.shape
@@ -188,13 +189,22 @@ class Follower:
         cropped_cv_image_red_l = cv_image[((height//20)*17):((height//20)*18), 0:(width//2)]
         cropped_cv_image_red_r = cv_image[((height//20)*17):((height//20)*18), (width//2):width]
 
+        # crop image into left and right for green and blue get_min_middle_dist
+        cropped_cv_image_l = cv_image[0:height, 0:(width//2)]
+        cropped_cv_image_r = cv_image[0:height, (width//2):width]
+
         # create HSV colour space
         hsv_img = cv2.cvtColor(cv_image, cv2.COLOR_BGR2HSV)
         cropped_hsv_img_red_l = cv2.cvtColor(cropped_cv_image_red_l, cv2.COLOR_BGR2HSV)
         cropped_hsv_img_red_r = cv2.cvtColor(cropped_cv_image_red_r, cv2.COLOR_BGR2HSV)
+        cropped_hsv_img_l = cv2.cvtColor(cropped_cv_image_l, cv2.COLOR_BGR2HSV)
+        cropped_hsv_img_r = cv2.cvtColor(cropped_cv_image_r, cv2.COLOR_BGR2HSV)
 
         # calculate colour thresholds
-        blue_hsv_thresh = cv2.inRange(hsv_img,
+        blue_hsv_thresh_left = cv2.inRange(cropped_hsv_img_l,
+                                 numpy.array((110, 50, 50)),
+                                 numpy.array((130, 255, 255)))
+        blue_hsv_thresh_right = cv2.inRange(cropped_hsv_img_r,
                                  numpy.array((110, 50, 50)),
                                  numpy.array((130, 255, 255)))
 
@@ -213,13 +223,20 @@ class Follower:
         red_hsv_thresh_left = red_hsv_thresh_l1 +red_hsv_thresh_l2
         red_hsv_thresh_right = red_hsv_thresh_r1 +red_hsv_thresh_r2
 
-        green_hsv_thresh = cv2.inRange(hsv_img,
+        green_hsv_thresh_left = cv2.inRange(cropped_hsv_img_l,
+                               numpy.array((50, 50, 50)),
+                               numpy.array((70, 255, 255)))
+        green_hsv_thresh_right = cv2.inRange(cropped_hsv_img_r,
                                numpy.array((50, 50, 50)),
                                numpy.array((70, 255, 255)))
 
         # find the contours in the mask generated from the HSV image.
-        _, blue_hsv_contours, hierachy = cv2.findContours(
-            blue_hsv_thresh.copy(),
+        _, blue_hsv_contours_left, hierachy = cv2.findContours(
+            blue_hsv_thresh_left.copy(),
+            cv2.RETR_TREE,
+            cv2.CHAIN_APPROX_SIMPLE)
+        _, blue_hsv_contours_right, hierachy = cv2.findContours(
+            blue_hsv_thresh_right.copy(),
             cv2.RETR_TREE,
             cv2.CHAIN_APPROX_SIMPLE)
 
@@ -227,24 +244,42 @@ class Follower:
             red_hsv_thresh_left.copy(),
             cv2.RETR_TREE,
             cv2.CHAIN_APPROX_SIMPLE)
-
         _, red_hsv_contours_right, hierachy = cv2.findContours(
             red_hsv_thresh_right.copy(),
             cv2.RETR_TREE,
             cv2.CHAIN_APPROX_SIMPLE)
 
-        _, green_hsv_contours, hierachy = cv2.findContours(
-            green_hsv_thresh.copy(),
+        _, green_hsv_contours_left, hierachy = cv2.findContours(
+            green_hsv_thresh_left.copy(),
+            cv2.RETR_TREE,
+            cv2.CHAIN_APPROX_SIMPLE)
+        _, green_hsv_contours_right, hierachy = cv2.findContours(
+            green_hsv_thresh_right.copy(),
             cv2.RETR_TREE,
             cv2.CHAIN_APPROX_SIMPLE)
 
+
         # iterate over all those found contours and calculate area
-        for c in blue_hsv_contours:
+        for c in blue_hsv_contours_left:
             a = cv2.contourArea(c)
             # if the area is big enough draw  outline
             if a > 100.0:
                 cv2.drawContours(cv_image, c, -1, (255, 0, 0), 3)
                 print "i see blue:", a,"%"
+                seen_blue = True
+                blue_dir = "left"
+
+        for c in blue_hsv_contours_right:
+            a = cv2.contourArea(c)
+            # if the area is big enough draw  outline
+            if a > 100.0:
+                cv2.drawContours(cv_image, c, -1, (255, 0, 0), 3)
+                print "i see blue:", a,"%"
+                seen_blue = True
+                if blue_dir == "left":
+                    blue_dir = "forward"
+                else:
+                    blue_dir = "right"
 
         for c in red_hsv_contours_left:
             a = cv2.contourArea(c)
@@ -264,14 +299,30 @@ class Follower:
                 seen_red = True
                 red_dir = "right"
 
-        for c in green_hsv_contours:
+        for c in green_hsv_contours_left:
             a = cv2.contourArea(c)
             # if the area is big enough draw  outline
             if a > 1000.0:
                 cv2.drawContours(cv_image, c, -1, (0, 255, 0), 3)
                 print "i see green:", a,"%"
+                seen_green = True
+                green_dir = "left"
 
-        self.moving_from_red = [seen_red,red_dir]
+        for c in green_hsv_contours_right:
+            a = cv2.contourArea(c)
+            # if the area is big enough draw  outline
+            if a > 100.0:
+                cv2.drawContours(cv_image, c, -1, (255, 0, 0), 3)
+                print "i see blue:", a,"%"
+                seen_green = True
+                if green_dir == "left":
+                    green_dir = "forward"
+                else:
+                    green_dir = "right"
+
+        self.moving_from_red = [seen_red, red_dir]
+        self.moving_to_green = [seen_green, green_dir]
+        self.moving_to_blue = [seen_blue, blue_dir]
         cv2.imshow("Image window", cv_image)
         cv2.imshow("Cropped image window", cropped_cv_image_red_l)
         cv2.waitKey(1)
