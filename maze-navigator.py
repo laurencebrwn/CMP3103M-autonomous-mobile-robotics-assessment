@@ -27,24 +27,26 @@ class Follower:
         self.moving_to_green = [False,""]
         self.moving_to_blue = [False,""]
         self.final_route_stated = False
+        self.finished = False
 
     def laser_callback_follow_open(self, msg):
         ranges = [x for x in msg.ranges if str(x) != 'nan']
+        if self.finishd == False:
+            if self.moving_from_red[0] == True:
+                self.red_movement(ranges)
+            elif self.moving_to_green[0] == True:
+                self.green_movement(ranges)
+            elif self.moving_to_blue[0] == True:
+                self.blue_movement(ranges)
+            elif self.final_route_stated == False:
+                self.normal_movement(ranges)
+            else:
+                self.finished = True
+                self.twist.linear.x = 0
+                self.twist.angular.z = 0
+                print "finished"
 
-        if self.moving_from_red[0] == True:
-            self.red_movement(ranges)
-        elif self.moving_to_green[0] == True:
-            self.green_movement(ranges)
-        elif self.moving_to_blue[0] == True:
-            self.blue_movement(ranges)
-        elif self.final_route_stated == False:
-            self.normal_movement(ranges)
-        else:
-            self.twist.linear.x = 0
-            self.twist.angular.z = 0
-            print "finished"
-
-        self.cmd_vel_pub.publish(self.twist)
+            self.cmd_vel_pub.publish(self.twist)
 
     def red_movement(self, ranges):
         self.twist.linear.x = 0
