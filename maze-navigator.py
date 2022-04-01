@@ -28,6 +28,7 @@ class Follower:
         self.moving_to_blue = [False,""]
         self.final_route_stated = False
         self.finished = False
+        self.green_close = False
 
     def laser_callback_follow_open(self, msg):
         ranges = [x for x in msg.ranges if str(x) != 'nan']
@@ -38,9 +39,9 @@ class Follower:
                 self.green_movement(ranges)
             elif self.moving_to_blue[0] == True and self.final_route_stated == False:
                 self.blue_movement(ranges)
-            elif self.final_route_stated == False:
+            elif self.green_close == False:
                 self.normal_movement(ranges)
-            else:
+            elif self.green_close == True:
                 self.finished = True
                 self.twist.linear.x = 0
                 self.twist.angular.z = 0
@@ -240,12 +241,16 @@ class Follower:
         cropped_cv_image_l = cv_image[0:height, 0:(width//2)]
         cropped_cv_image_r = cv_image[0:height, (width//2):width]
 
+        # crop image for close to green
+        cropped_cv_image_green = cv_image[((height//20)*17):((height//20)*18), 0:width]
+
         # create HSV colour space
         hsv_img = cv2.cvtColor(cv_image, cv2.COLOR_BGR2HSV)
         cropped_hsv_img_red_l = cv2.cvtColor(cropped_cv_image_red_l, cv2.COLOR_BGR2HSV)
         cropped_hsv_img_red_r = cv2.cvtColor(cropped_cv_image_red_r, cv2.COLOR_BGR2HSV)
         cropped_hsv_img_l = cv2.cvtColor(cropped_cv_image_l, cv2.COLOR_BGR2HSV)
         cropped_hsv_img_r = cv2.cvtColor(cropped_cv_image_r, cv2.COLOR_BGR2HSV)
+        cropped_hsv_img_green = cv2.cvtColor(cropped_cv_image_green, cv2.COLOR_BGR2HSV)
 
         # calculate colour thresholds
         blue_hsv_thresh_left = cv2.inRange(cropped_hsv_img_l,
@@ -276,6 +281,9 @@ class Follower:
         green_hsv_thresh_right = cv2.inRange(cropped_hsv_img_r,
                                numpy.array((50, 50, 50)),
                                numpy.array((70, 255, 255)))
+        green_hsv_thresh_close = cv2.inRange(cropped_hsv_img_green,
+                               numpy.array((50, 50, 50)),
+                               numpy.array((70, 255, 255)))
 
         # find the contours in the mask generated from the HSV image.
         _, blue_hsv_contours_left, hierachy = cv2.findContours(
@@ -302,6 +310,10 @@ class Follower:
             cv2.CHAIN_APPROX_SIMPLE)
         _, green_hsv_contours_right, hierachy = cv2.findContours(
             green_hsv_thresh_right.copy(),
+            cv2.RETR_TREE,
+            cv2.CHAIN_APPROX_SIMPLE)
+        _, green_hsv_contours_close, hierachy = cv2.findContours(
+            green_hsv_thresh_close.copy(),
             cv2.RETR_TREE,
             cv2.CHAIN_APPROX_SIMPLE)
 
@@ -366,6 +378,14 @@ class Follower:
                     green_dir = "forward"
                 else:
                     green_dir = "right"
+
+        for c in green_hsv_contours_close:
+            a = cv2.contourArea(c)
+            # if the area is big enough draw  outline
+            if a > 100.0:
+                cv2.drawContours(cv_image, c, -1, (255, 0, 0), 3)
+                print "green is very close!"
+                self.green_close = True
 
         self.moving_from_red = [seen_red, red_dir]
         self.moving_to_green = [seen_green, green_dir]
