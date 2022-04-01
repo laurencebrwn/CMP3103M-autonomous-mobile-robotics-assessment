@@ -242,7 +242,7 @@ class Follower:
         cropped_cv_image_r = cv_image[0:height, (width//2):width]
 
         # crop image for close to green
-        cropped_cv_image_green = cv_image[((height//20)*17):((height//20)*18), 0:width]
+        cropped_cv_image_green = cv_image[((height//20)*17):((height//20)*18), (width//3)((width//3)*2)]
 
         # create HSV colour space
         hsv_img = cv2.cvtColor(cv_image, cv2.COLOR_BGR2HSV)
