@@ -116,12 +116,15 @@ class Follower:
                     print "stuck in corner"
                     self.still_turning = True
                     self.twist.linear.x = 0
-                    if self.prev_direction == 'left':
+                    if self.prev_direction == 'right':
                         print "turning left"
                         self.twist.angular.z = 0.5
+                        self.prev_direction = 'left'
                     else:
                         print "turning right"
                         self.twist.angular.z = -0.5
+                        self.prev_direction = 'right'
+                        
                 elif 0 == max(range(len(distances)), key=distances.__getitem__) or 4 == min(range(len(distances)), key=distances.__getitem__):
                     print "moving hard left"
                     self.twist.linear.x = max_vel/2
