@@ -69,7 +69,7 @@ class Follower:
     def blue_movement(self, ranges):
         min_dist = min(ranges)
         print ranges
-        if min_dist < 0.4 or self.moving_to_blue[1] == "both":
+        if min_dist < 0.6 or self.moving_to_blue[1] == "both":
             self.normal_movement(ranges)
         elif self.moving_to_blue[1] == "right":
             self.twist.linear.x = 0.25
@@ -148,19 +148,19 @@ class Follower:
                     self.prev_direction = 'right'
 
     def get_range_far_left_dist(self, ranges):
-        left = ranges[0:(len(ranges)//5)]
+        left = ranges[((len(ranges) // 5)*4):(len(ranges))]
         return sum(left)/len(left)
 
     def get_range_left_dist(self, ranges):
-        left = ranges[(len(ranges)//5):((len(ranges)//5)*2)]
+        left = ranges[((len(ranges) // 5)*3):((len(ranges) // 5)*4)]
         return sum(left)/len(left)
 
     def get_range_right_dist(self, ranges):
-        right = ranges[((len(ranges) // 5)*3):((len(ranges) // 5)*4)]
+        right = ranges[(len(ranges)//5):((len(ranges)//5)*2)]
         return sum(right)/len(right)
 
     def get_range_far_right_dist(self, ranges):
-        right = ranges[((len(ranges) // 5)*4):(len(ranges))]
+        right = ranges[0:(len(ranges)//5)]
         return sum(right)/len(right)
 
     def get_range_middle_dist(self, ranges):
