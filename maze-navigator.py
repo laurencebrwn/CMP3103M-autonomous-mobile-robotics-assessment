@@ -64,7 +64,7 @@ class Follower:
             self.twist.linear.x = 0
             self.twist.angular.z = -1
 
-    def moving_to_blue(self, ranges):
+    def blue_movement(self, ranges):
         min_middle_dist = self.get_min_middle_dist(ranges)
         if min_middle_dist > 0.4:
             if self.moving_to_blue[1] == "both":
