@@ -60,6 +60,10 @@ class Follower:
             self.prev_direction = 'right'
 
     def green_movement(self, ranges):
+        far_left_dist = self.get_range_far_left_dist(ranges)
+        left_dist = self.get_range_left_dist(ranges)
+        right_dist = self.get_range_right_dist(ranges)
+        far_right_dist = self.get_range_far_right_dist(ranges)
         min_dist = min(ranges)
         self.final_route_stated = True
         if min_dist > 0.4:
