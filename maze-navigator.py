@@ -36,7 +36,7 @@ class Follower:
                 self.red_movement(ranges)
             elif self.moving_to_green[0] == True:
                 self.green_movement(ranges)
-            elif self.moving_to_blue[0] == True:
+            elif self.moving_to_blue[0] == True && self.final_route_stated = False:
                 self.blue_movement(ranges)
             elif self.final_route_stated == False:
                 self.normal_movement(ranges)
@@ -211,10 +211,10 @@ class Follower:
 
         # calculate colour thresholds
         blue_hsv_thresh_left = cv2.inRange(cropped_hsv_img_l,
-                                 numpy.array((100, 150, 0)),
-                                 numpy.array((120, 255, 255)))
+                                 numpy.array((110, 150, 50)),
+                                 numpy.array((130, 255, 255)))
         blue_hsv_thresh_right = cv2.inRange(cropped_hsv_img_r,
-                                 numpy.array((110, 80, 80)),
+                                 numpy.array((110, 150, 50)),
                                  numpy.array((130, 255, 255)))
 
         red_hsv_thresh_l1 = cv2.inRange(cropped_hsv_img_red_l,
