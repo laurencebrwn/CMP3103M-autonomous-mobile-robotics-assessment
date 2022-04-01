@@ -42,7 +42,7 @@ class Follower:
         else:
             self.twist.linear.x = 0
             self.twist.angular.z = 0
-            pint "finished"
+            print "finished"
 
         self.cmd_vel_pub.publish(self.twist)
 
