@@ -209,8 +209,8 @@ class Follower:
 
         # calculate colour thresholds
         blue_hsv_thresh_left = cv2.inRange(cropped_hsv_img_l,
-                                 numpy.array((110, 80, 80)),
-                                 numpy.array((130, 255, 255)))
+                                 numpy.array((100, 150, 0)),
+                                 numpy.array((120, 255, 255)))
         blue_hsv_thresh_right = cv2.inRange(cropped_hsv_img_r,
                                  numpy.array((110, 80, 80)),
                                  numpy.array((130, 255, 255)))
