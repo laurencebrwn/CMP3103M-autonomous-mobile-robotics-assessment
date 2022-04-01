@@ -139,10 +139,15 @@ class Follower:
                         self.twist.angular.z = 0
 
                 elif 1 == max(range(len(distances)), key=distances.__getitem__):
-                    print "moving left"
-                    self.twist.linear.x = max_vel
-                    self.twist.angular.z = 0.5
-                    self.prev_direction = 'left'
+                    if left_dist > (middle_dist*1.5) or left_dist < 8:
+                        print "moving left"
+                        self.twist.linear.x = max_vel
+                        self.twist.angular.z = 0.5
+                        self.prev_direction = 'left'
+                    else:
+                        print "moving forward"
+                        self.twist.linear.x = max_vel
+                        self.twist.angular.z = 0
 
                 elif 2 == max(range(len(distances)), key=distances.__getitem__):
                     print "moving forward"
@@ -150,10 +155,15 @@ class Follower:
                     self.twist.angular.z = 0
 
                 elif 3 == max(range(len(distances)), key=distances.__getitem__):
-                    print "moving right"
-                    self.twist.linear.x = max_vel
-                    self.twist.angular.z = -0.5
-                    self.prev_direction = 'right'
+                    if right_dist > (middle_dist*1.5) or right_dist < 8:
+                        print "moving right"
+                        self.twist.linear.x = max_vel
+                        self.twist.angular.z = -0.5
+                        self.prev_direction = 'right'
+                    else:
+                        print "moving forward"
+                        self.twist.linear.x = max_vel
+                        self.twist.angular.z = 0
 
                 elif 4 == max(range(len(distances)), key=distances.__getitem__) or 0 == min(range(len(distances)), key=distances.__getitem__):
                     if far_right_dist > (middle_dist*1.5) or far_right_dist < 8:
