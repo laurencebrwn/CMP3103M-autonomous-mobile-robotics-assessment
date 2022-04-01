@@ -70,7 +70,7 @@ class Follower:
     def blue_movement(self, ranges):
         min_dist = min(ranges)
         print ranges
-        if min_dist < 0.6 or self.moving_to_blue[1] == "both":
+        if min_dist < 1 or self.moving_to_blue[1] == "both":
             self.normal_movement(ranges)
         elif self.moving_to_blue[1] == "right":
             self.twist.linear.x = 0.25
