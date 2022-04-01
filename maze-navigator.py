@@ -54,7 +54,7 @@ class Follower:
             self.twist.angular.z = -1
             self.prev_direction = 'right'
 
-    def moving_to_green(self, ranges):
+    def green_movement(self, ranges):
         self.final_route_stated = True
         if self.moving_to_green[1] == "both":
             self.normal_movement(ranges)
