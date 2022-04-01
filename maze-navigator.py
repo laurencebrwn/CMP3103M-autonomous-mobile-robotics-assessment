@@ -68,6 +68,7 @@ class Follower:
 
     def blue_movement(self, ranges):
         min_dist = min(ranges)
+        print ranges
         if min_dist < 0.4 or self.moving_to_blue[1] == "both":
             self.normal_movement(ranges)
         elif self.moving_to_blue[1] == "right":
