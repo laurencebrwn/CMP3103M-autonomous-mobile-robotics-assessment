@@ -127,11 +127,16 @@ class Follower:
                         self.twist.angular.z = -0.5
                         self.prev_direction = 'right'
 
-                elif 0 == max(range(len(distances)), key=distances.__getitem__) and far_left_dist > (middle_dist*1.5):
-                    print "moving hard left"
-                    self.twist.linear.x = max_vel/2
-                    self.twist.angular.z = 0.75
-                    self.prev_direction = 'left'
+                elif 0 == max(range(len(distances)), key=distances.__getitem__) or 4 == min(range(len(distances)), key=distances.__getitem__):
+                    if far_left_dist > (middle_dist*1.5):
+                        print "moving hard left"
+                        self.twist.linear.x = max_vel/2
+                        self.twist.angular.z = 0.75
+                        self.prev_direction = 'left'
+                    else:
+                        print "moving forward"
+                        self.twist.linear.x = max_vel
+                        self.twist.angular.z = 0
 
                 elif 1 == max(range(len(distances)), key=distances.__getitem__):
                     print "moving left"
@@ -150,11 +155,16 @@ class Follower:
                     self.twist.angular.z = -0.5
                     self.prev_direction = 'right'
 
-                elif 4 == max(range(len(distances)), key=distances.__getitem__) and far_right_dist > (middle_dist*1.5):
-                    print "moving hard right"
-                    self.twist.linear.x = max_vel/2
-                    self.twist.angular.z = -0.75
-                    self.prev_direction = 'right'
+                elif 4 == max(range(len(distances)), key=distances.__getitem__) or 0 == min(range(len(distances)), key=distances.__getitem__):
+                    if far_right_dist > (middle_dist*1.5):
+                        print "moving hard right"
+                        self.twist.linear.x = max_vel/2
+                        self.twist.angular.z = -0.75
+                        self.prev_direction = 'right'
+                    else:
+                        print "moving forward"
+                        self.twist.linear.x = max_vel
+                        self.twist.angular.z = 0
 
             else:
                 self.still_turning = True
