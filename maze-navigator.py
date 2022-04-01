@@ -61,16 +61,30 @@ class Follower:
 
     def green_movement(self, ranges):
         self.final_route_stated = True
-        if self.moving_to_green[1] == "both":
-            self.normal_movement(ranges)
-        elif self.moving_to_green[1] == "right":
-            self.twist.linear.x = 0.25
-            self.twist.angular.z = -1
-            self.prev_direction = 'right'
+        if min_dist > 0.4:
+            if self.moving_to_green[1] == "both":
+                self.normal_movement(ranges)
+            elif self.moving_to_green[1] == "right":
+                self.twist.linear.x = 0.25
+                self.twist.angular.z = -1
+                self.prev_direction = 'right'
+            else:
+                self.twist.linear.x = 0.25
+                self.twist.angular.z = 1
+                self.prev_direction = 'left'
         else:
-            self.twist.linear.x = 0.25
-            self.twist.angular.z = 1
-            self.prev_direction = 'left'
+            self.still_turning = True
+            self.twist.linear.x = 0
+            if min_dist < 0.32:
+                self.twist.linear.x = -0.25
+            elif (far_left_dist + left_dist)/2 > (far_right_dist + right_dist)/2:
+                print "turning left"
+                self.twist.angular.z = 0.5
+                self.prev_direction = 'left'
+            else:
+                print "turning right"
+                self.twist.angular.z = -0.5
+                self.prev_direction = 'right'
 
     def blue_movement(self, ranges):
         min_dist = min(ranges)
