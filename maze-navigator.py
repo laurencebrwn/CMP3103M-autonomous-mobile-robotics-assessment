@@ -99,7 +99,9 @@ class Follower:
         far_right_dist = self.get_range_far_right_dist(ranges)
         min_dist = min(ranges)
         #print ranges
-        if min([far_left_dist,left_dist]) < 0.4 and self.moving_to_blue[1] == "right":
+        if min_dist <0.32:
+            self.normal_movement(ranges)
+        elif min([far_left_dist,left_dist]) < 0.4 and self.moving_to_blue[1] == "right":
             print "turning right"
             self.twist.linear.x = 0
             self.twist.angular.z = -0.5
