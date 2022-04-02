@@ -109,7 +109,7 @@ class Follower:
             self.twist.linear.x = 0
             self.twist.angular.z = 0.5
             self.prev_direction = 'left'
-        elif min_dist < 1:
+        elif middle_dist < 1:
             self.normal_movement(ranges)
         elif self.moving_to_blue[1] == "right":
             self.twist.linear.x = 0.25
