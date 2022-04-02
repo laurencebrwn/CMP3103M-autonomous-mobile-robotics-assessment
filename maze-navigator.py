@@ -98,11 +98,11 @@ class Follower:
             self.normal_movement(ranges)
         elif self.moving_to_blue[1] == "right":
             self.twist.linear.x = 0.25
-            self.twist.angular.z = -1
+            self.twist.angular.z = -0.5
             self.prev_direction = 'right'
         else:
             self.twist.linear.x = 0.25
-            self.twist.angular.z = 1
+            self.twist.angular.z = 0.5
             self.prev_direction = 'left'
 
     def normal_movement(self, ranges):
@@ -409,8 +409,6 @@ class Follower:
         self.moving_from_red = [seen_red, red_dir]
         self.moving_to_green = [seen_green, green_dir]
         self.moving_to_blue = [seen_blue, blue_dir]
-        cv2.imshow("Image window", cv_image)
-        cv2.imshow("Cropped image window", cropped_cv_image_red_l)
         cv2.waitKey(1)
 
 
