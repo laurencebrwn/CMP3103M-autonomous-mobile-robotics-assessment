@@ -92,34 +92,17 @@ class Follower:
                 self.prev_direction = 'right'
 
     def blue_movement(self, ranges):
-        far_left_dist = self.get_range_far_left_dist(ranges)
-        left_dist = self.get_range_left_dist(ranges)
-        middle_dist = self.get_range_middle_dist(ranges)
-        right_dist = self.get_range_right_dist(ranges)
-        far_right_dist = self.get_range_far_right_dist(ranges)
         min_dist = min(ranges)
-        #print ranges
-        if min_dist <0.32:
-            self.normal_movement(ranges)
-        elif min([far_left_dist,left_dist]) < 0.4 and self.moving_to_blue[1] == "right":
-            print "turning right"
-            self.twist.linear.x = 0
-            self.twist.angular.z = -1
-            self.prev_direction = 'right'
-        elif min([far_right_dist,right_dist]) < 0.4 and self.moving_to_blue[1] == "left":
-            print "turning left"
-            self.twist.linear.x = 0
-            self.twist.angular.z = 1
-            self.prev_direction = 'left'
-        elif middle_dist < 1:
+        print ranges
+        if min_dist < 1 or self.moving_to_blue[1] == "both":
             self.normal_movement(ranges)
         elif self.moving_to_blue[1] == "right":
             self.twist.linear.x = 0.25
-            self.twist.angular.z = -0.75
+            self.twist.angular.z = -0.5
             self.prev_direction = 'right'
         else:
             self.twist.linear.x = 0.25
-            self.twist.angular.z = 0.75
+            self.twist.angular.z = 0.5
             self.prev_direction = 'left'
 
     def normal_movement(self, ranges):
@@ -165,7 +148,7 @@ class Follower:
                         self.prev_direction = 'right'
 
                 elif 0 == max(range(len(distances)), key=distances.__getitem__) or 4 == min(range(len(distances)), key=distances.__getitem__):
-                    if far_left_dist > (middle_dist*1.5) or far_left_dist < 5:
+                    if far_left_dist > (middle_dist*1.5) or far_left_dist < 8:
                         print "moving hard left"
                         self.twist.linear.x = max_vel/2
                         self.twist.angular.z = 0.75
@@ -176,7 +159,7 @@ class Follower:
                         self.twist.angular.z = 0
 
                 elif 1 == max(range(len(distances)), key=distances.__getitem__):
-                    if left_dist > (middle_dist*1.5) or left_dist < 5:
+                    if left_dist > (middle_dist*1.5) or left_dist < 8:
                         print "moving left"
                         self.twist.linear.x = max_vel
                         self.twist.angular.z = 0.5
@@ -192,7 +175,7 @@ class Follower:
                     self.twist.angular.z = 0
 
                 elif 3 == max(range(len(distances)), key=distances.__getitem__):
-                    if right_dist > (middle_dist*1.5) or right_dist < 5:
+                    if right_dist > (middle_dist*1.5) or right_dist < 8:
                         print "moving right"
                         self.twist.linear.x = max_vel
                         self.twist.angular.z = -0.5
@@ -203,7 +186,7 @@ class Follower:
                         self.twist.angular.z = 0
 
                 elif 4 == max(range(len(distances)), key=distances.__getitem__) or 0 == min(range(len(distances)), key=distances.__getitem__):
-                    if far_right_dist > (middle_dist*1.5) or far_right_dist < 5:
+                    if far_right_dist > (middle_dist*1.5) or far_right_dist < 8:
                         print "moving hard right"
                         self.twist.linear.x = max_vel/2
                         self.twist.angular.z = -0.75
@@ -252,8 +235,6 @@ class Follower:
         return min(middle)
 
     def image_callback(self, data):
-        cv2.namedWindow("Image window", 1)
-        cv2.namedWindow("Cropped image window", 2)
         try:
             cv_image = self.bridge.imgmsg_to_cv2(data, "bgr8")
         except CvBridgeError, e:
