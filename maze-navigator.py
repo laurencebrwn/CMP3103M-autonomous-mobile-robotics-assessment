@@ -104,22 +104,22 @@ class Follower:
         elif min([far_left_dist,left_dist]) < 0.4 and self.moving_to_blue[1] == "right":
             print "turning right"
             self.twist.linear.x = 0
-            self.twist.angular.z = -0.5
+            self.twist.angular.z = -1
             self.prev_direction = 'right'
         elif min([far_right_dist,right_dist]) < 0.4 and self.moving_to_blue[1] == "left":
             print "turning left"
             self.twist.linear.x = 0
-            self.twist.angular.z = 0.5
+            self.twist.angular.z = 1
             self.prev_direction = 'left'
         elif middle_dist < 1:
             self.normal_movement(ranges)
         elif self.moving_to_blue[1] == "right":
             self.twist.linear.x = 0.25
-            self.twist.angular.z = -0.5
+            self.twist.angular.z = -0.75
             self.prev_direction = 'right'
         else:
             self.twist.linear.x = 0.25
-            self.twist.angular.z = 0.5
+            self.twist.angular.z = 0.75
             self.prev_direction = 'left'
 
     def normal_movement(self, ranges):
