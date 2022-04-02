@@ -129,8 +129,10 @@ class Follower:
             elif min_dist < 0.32:
                 self.twist.linear.x = -0.25
             elif self.prev_direction == 'right':
+                self.twist.linear.x = 0
                 self.twist.angular.z = -1
             elif self.prev_direction == 'left':
+                self.twist.linear.x = 0
                 self.twist.angular.z = 1
         else:
             if min_dist > 0.4:
@@ -198,15 +200,16 @@ class Follower:
 
             else:
                 self.still_turning = True
-                self.twist.linear.x = 0
                 if min_dist < 0.32:
                     self.twist.linear.x = -0.25
                 elif (far_left_dist + left_dist)/2 > (far_right_dist + right_dist)/2:
                     print "turning left"
+                    self.twist.linear.x = 0
                     self.twist.angular.z = 0.5
                     self.prev_direction = 'left'
                 else:
                     print "turning right"
+                    self.twist.linear.x = 0
                     self.twist.angular.z = -0.5
                     self.prev_direction = 'right'
 
