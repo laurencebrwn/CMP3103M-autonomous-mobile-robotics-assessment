@@ -138,7 +138,7 @@ class Follower:
             self.twist.angular.z = -0.5
             self.prev_direction = 'right'
         # else, if blue is to the left, turn left
-        else self.moving_to_blue[1] == "left":
+        else:
             self.twist.linear.x = 0.25
             self.twist.angular.z = 0.5
             self.prev_direction = 'left'
