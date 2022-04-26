@@ -7,6 +7,13 @@ This solution will solve a maze using both laser distance measurements and an im
 ## To run the solution
 1. Firstly make sure you are running the script on the correct system, details of how to do so can be found here: [LCAS Home Installation](https://github.com/LCAS/teaching/wiki/Home-Installation)
 2. Secondly, run the turtlebot simulator, for example opening the simulator with maze 1:
-```roslaunch uol_turtlebot_simulator maze1.launch```
+
+```
+roslaunch uol_turtlebot_simulator maze1.launch
+```
+
 3. Navigate into directory of this solution and run it:
-```python maze-navigator.py```
+
+```
+python maze-navigator.py
+```
