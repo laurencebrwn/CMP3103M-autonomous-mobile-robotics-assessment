@@ -441,7 +441,7 @@ class Follower:
                     print "i see blue:", a,"%" # debug
                     seen_blue = True
                     # if the colour is seen in both left and right sides, it must be ahead, so flag it so
-                    if blue_left_a > 15000 and  a > 15000:
+                    if blue_left_a > 1000 and  a > 1000:
                         blue_dir = "forward"
                     else:
                         blue_dir = "right"
@@ -482,7 +482,7 @@ class Follower:
                     print "i see green:", a,"%" # debug
                     seen_green = True
                     # if the colour is seen in both left and right sides, it must be ahead, so flag it so
-                    if green_left_a > 15000 and a > 15000:
+                    if green_left_a > 4000 and a > 4000:
                         green_dir = "forward"
                     else:
                         green_dir = "right"
