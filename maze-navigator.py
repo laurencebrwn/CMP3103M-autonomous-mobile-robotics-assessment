@@ -317,188 +317,189 @@ class Follower:
 
     # the image callback that detects red, green and blue object, from the robots camera, to inform its movement
     def image_callback(self, data):
-        # try to instantiate the CV2 bridge, using the BGR colour space
-        try:
-            cv_image = self.bridge.imgmsg_to_cv2(data, "bgr8")
-        except CvBridgeError, e:
-            print e
+        if self.finished == False:
+            # try to instantiate the CV2 bridge, using the BGR colour space
+            try:
+                cv_image = self.bridge.imgmsg_to_cv2(data, "bgr8")
+            except CvBridgeError, e:
+                print e
 
-        # instantiate variables that mark whether, and if so, where colours are seen
-        seen_red = False
-        red_dir = ""
-        seen_blue = False
-        blue_dir = ""
-        seen_green = False
-        green_dir = ""
-        green_a = 0
+            # instantiate variables that mark whether, and if so, where colours are seen
+            seen_red = False
+            red_dir = ""
+            seen_blue = False
+            blue_dir = ""
+            seen_green = False
+            green_dir = ""
+            green_a = 0
 
-        # crop image for red floor tiles
-        dimensions = cv_image.shape
-        height = cv_image.shape[0]
-        width = cv_image.shape[1]
-        cropped_cv_image_red_l = cv_image[((height//20)*17):((height//20)*18), 0:(width//2)]
-        cropped_cv_image_red_r = cv_image[((height//20)*17):((height//20)*18), (width//2):width]
+            # crop image for red floor tiles
+            dimensions = cv_image.shape
+            height = cv_image.shape[0]
+            width = cv_image.shape[1]
+            cropped_cv_image_red_l = cv_image[((height//20)*17):((height//20)*18), 0:(width//2)]
+            cropped_cv_image_red_r = cv_image[((height//20)*17):((height//20)*18), (width//2):width]
 
-        # crop image into left and right for green and blue get_min_middle_dist
-        cropped_cv_image_l = cv_image[0:height, 0:(width//2)]
-        cropped_cv_image_r = cv_image[0:height, (width//2):width]
+            # crop image into left and right for green and blue get_min_middle_dist
+            cropped_cv_image_l = cv_image[0:height, 0:(width//2)]
+            cropped_cv_image_r = cv_image[0:height, (width//2):width]
 
-        # crop image for close to green
-        cropped_cv_image_green = cv_image[((height//20)*17):((height//20)*18), (width//3):((width//3)*2)]
+            # crop image for close to green
+            cropped_cv_image_green = cv_image[((height//20)*17):((height//20)*18), (width//3):((width//3)*2)]
 
-        # create HSV colour space
-        hsv_img = cv2.cvtColor(cv_image, cv2.COLOR_BGR2HSV)
-        cropped_hsv_img_red_l = cv2.cvtColor(cropped_cv_image_red_l, cv2.COLOR_BGR2HSV)
-        cropped_hsv_img_red_r = cv2.cvtColor(cropped_cv_image_red_r, cv2.COLOR_BGR2HSV)
-        cropped_hsv_img_l = cv2.cvtColor(cropped_cv_image_l, cv2.COLOR_BGR2HSV)
-        cropped_hsv_img_r = cv2.cvtColor(cropped_cv_image_r, cv2.COLOR_BGR2HSV)
-        cropped_hsv_img_green = cv2.cvtColor(cropped_cv_image_green, cv2.COLOR_BGR2HSV)
+            # create HSV colour space
+            hsv_img = cv2.cvtColor(cv_image, cv2.COLOR_BGR2HSV)
+            cropped_hsv_img_red_l = cv2.cvtColor(cropped_cv_image_red_l, cv2.COLOR_BGR2HSV)
+            cropped_hsv_img_red_r = cv2.cvtColor(cropped_cv_image_red_r, cv2.COLOR_BGR2HSV)
+            cropped_hsv_img_l = cv2.cvtColor(cropped_cv_image_l, cv2.COLOR_BGR2HSV)
+            cropped_hsv_img_r = cv2.cvtColor(cropped_cv_image_r, cv2.COLOR_BGR2HSV)
+            cropped_hsv_img_green = cv2.cvtColor(cropped_cv_image_green, cv2.COLOR_BGR2HSV)
 
-        # calculate colour thresholds
-        blue_hsv_thresh_left = cv2.inRange(cropped_hsv_img_l,
-                                 numpy.array((110, 50, 50)),
-                                 numpy.array((130, 255, 255)))
-        blue_hsv_thresh_right = cv2.inRange(cropped_hsv_img_r,
-                                 numpy.array((110, 50, 50)),
-                                 numpy.array((130, 255, 255)))
+            # calculate colour thresholds
+            blue_hsv_thresh_left = cv2.inRange(cropped_hsv_img_l,
+                                     numpy.array((110, 50, 50)),
+                                     numpy.array((130, 255, 255)))
+            blue_hsv_thresh_right = cv2.inRange(cropped_hsv_img_r,
+                                     numpy.array((110, 50, 50)),
+                                     numpy.array((130, 255, 255)))
 
-        red_hsv_thresh_l1 = cv2.inRange(cropped_hsv_img_red_l,
-                                numpy.array((160, 50, 50)),
-                                numpy.array((180, 255, 255)))
-        red_hsv_thresh_l2 = cv2.inRange(cropped_hsv_img_red_l,
-                                numpy.array((0, 50, 50)),
-                                numpy.array((20, 255, 255)))
-        red_hsv_thresh_r1 = cv2.inRange(cropped_hsv_img_red_r,
-                                numpy.array((160, 50, 50)),
-                                numpy.array((180, 255, 255)))
-        red_hsv_thresh_r2 = cv2.inRange(cropped_hsv_img_red_r,
-                                numpy.array((0, 50, 50)),
-                                numpy.array((20, 255, 255)))
-        red_hsv_thresh_left = red_hsv_thresh_l1 +red_hsv_thresh_l2
-        red_hsv_thresh_right = red_hsv_thresh_r1 +red_hsv_thresh_r2
+            red_hsv_thresh_l1 = cv2.inRange(cropped_hsv_img_red_l,
+                                    numpy.array((160, 50, 50)),
+                                    numpy.array((180, 255, 255)))
+            red_hsv_thresh_l2 = cv2.inRange(cropped_hsv_img_red_l,
+                                    numpy.array((0, 50, 50)),
+                                    numpy.array((20, 255, 255)))
+            red_hsv_thresh_r1 = cv2.inRange(cropped_hsv_img_red_r,
+                                    numpy.array((160, 50, 50)),
+                                    numpy.array((180, 255, 255)))
+            red_hsv_thresh_r2 = cv2.inRange(cropped_hsv_img_red_r,
+                                    numpy.array((0, 50, 50)),
+                                    numpy.array((20, 255, 255)))
+            red_hsv_thresh_left = red_hsv_thresh_l1 +red_hsv_thresh_l2
+            red_hsv_thresh_right = red_hsv_thresh_r1 +red_hsv_thresh_r2
 
-        green_hsv_thresh_left = cv2.inRange(cropped_hsv_img_l,
-                               numpy.array((50, 50, 50)),
-                               numpy.array((70, 255, 255)))
-        green_hsv_thresh_right = cv2.inRange(cropped_hsv_img_r,
-                               numpy.array((50, 50, 50)),
-                               numpy.array((70, 255, 255)))
-        green_hsv_thresh_close = cv2.inRange(cropped_hsv_img_green,
-                               numpy.array((50, 50, 50)),
-                               numpy.array((70, 255, 255)))
+            green_hsv_thresh_left = cv2.inRange(cropped_hsv_img_l,
+                                   numpy.array((50, 50, 50)),
+                                   numpy.array((70, 255, 255)))
+            green_hsv_thresh_right = cv2.inRange(cropped_hsv_img_r,
+                                   numpy.array((50, 50, 50)),
+                                   numpy.array((70, 255, 255)))
+            green_hsv_thresh_close = cv2.inRange(cropped_hsv_img_green,
+                                   numpy.array((50, 50, 50)),
+                                   numpy.array((70, 255, 255)))
 
-        # find the contours in the mask generated from the HSV image.
-        _, blue_hsv_contours_left, hierachy = cv2.findContours(
-            blue_hsv_thresh_left.copy(),
-            cv2.RETR_TREE,
-            cv2.CHAIN_APPROX_SIMPLE)
-        _, blue_hsv_contours_right, hierachy = cv2.findContours(
-            blue_hsv_thresh_right.copy(),
-            cv2.RETR_TREE,
-            cv2.CHAIN_APPROX_SIMPLE)
+            # find the contours in the mask generated from the HSV image.
+            _, blue_hsv_contours_left, hierachy = cv2.findContours(
+                blue_hsv_thresh_left.copy(),
+                cv2.RETR_TREE,
+                cv2.CHAIN_APPROX_SIMPLE)
+            _, blue_hsv_contours_right, hierachy = cv2.findContours(
+                blue_hsv_thresh_right.copy(),
+                cv2.RETR_TREE,
+                cv2.CHAIN_APPROX_SIMPLE)
 
-        _, red_hsv_contours_left, hierachy = cv2.findContours(
-            red_hsv_thresh_left.copy(),
-            cv2.RETR_TREE,
-            cv2.CHAIN_APPROX_SIMPLE)
-        _, red_hsv_contours_right, hierachy = cv2.findContours(
-            red_hsv_thresh_right.copy(),
-            cv2.RETR_TREE,
-            cv2.CHAIN_APPROX_SIMPLE)
+            _, red_hsv_contours_left, hierachy = cv2.findContours(
+                red_hsv_thresh_left.copy(),
+                cv2.RETR_TREE,
+                cv2.CHAIN_APPROX_SIMPLE)
+            _, red_hsv_contours_right, hierachy = cv2.findContours(
+                red_hsv_thresh_right.copy(),
+                cv2.RETR_TREE,
+                cv2.CHAIN_APPROX_SIMPLE)
 
-        _, green_hsv_contours_left, hierachy = cv2.findContours(
-            green_hsv_thresh_left.copy(),
-            cv2.RETR_TREE,
-            cv2.CHAIN_APPROX_SIMPLE)
-        _, green_hsv_contours_right, hierachy = cv2.findContours(
-            green_hsv_thresh_right.copy(),
-            cv2.RETR_TREE,
-            cv2.CHAIN_APPROX_SIMPLE)
-        _, green_hsv_contours_close, hierachy = cv2.findContours(
-            green_hsv_thresh_close.copy(),
-            cv2.RETR_TREE,
-            cv2.CHAIN_APPROX_SIMPLE)
+            _, green_hsv_contours_left, hierachy = cv2.findContours(
+                green_hsv_thresh_left.copy(),
+                cv2.RETR_TREE,
+                cv2.CHAIN_APPROX_SIMPLE)
+            _, green_hsv_contours_right, hierachy = cv2.findContours(
+                green_hsv_thresh_right.copy(),
+                cv2.RETR_TREE,
+                cv2.CHAIN_APPROX_SIMPLE)
+            _, green_hsv_contours_close, hierachy = cv2.findContours(
+                green_hsv_thresh_close.copy(),
+                cv2.RETR_TREE,
+                cv2.CHAIN_APPROX_SIMPLE)
 
 
-        # iterate over all those found contours and calculate area
-        for c in blue_hsv_contours_left:
-            a = cv2.contourArea(c)
-            # if the area is big enough flag it has seen the colour, and its direction
-            if a > 100.0:
-                cv2.drawContours(cv_image, c, -1, (255, 0, 0), 3)
-                print "i see blue:", a,"%" # debug
-                seen_blue = True
-                blue_dir = "left"
+            # iterate over all those found contours and calculate area
+            for c in blue_hsv_contours_left:
+                a = cv2.contourArea(c)
+                # if the area is big enough flag it has seen the colour, and its direction
+                if a > 100.0:
+                    cv2.drawContours(cv_image, c, -1, (255, 0, 0), 3)
+                    print "i see blue:", a,"%" # debug
+                    seen_blue = True
+                    blue_dir = "left"
 
-        for c in blue_hsv_contours_right:
-            a = cv2.contourArea(c)
-            # if the area is big enough flag it has seen the colour, and its direction
-            if a > 100.0:
-                cv2.drawContours(cv_image, c, -1, (255, 0, 0), 3)
-                print "i see blue:", a,"%" # debug
-                seen_blue = True
-                # if the colour is seen in both left and right sides, it must be ahead, so flag it so
-                if blue_dir == "left":
-                    blue_dir = "forward"
-                else:
-                    blue_dir = "right"
+            for c in blue_hsv_contours_right:
+                a = cv2.contourArea(c)
+                # if the area is big enough flag it has seen the colour, and its direction
+                if a > 100.0:
+                    cv2.drawContours(cv_image, c, -1, (255, 0, 0), 3)
+                    print "i see blue:", a,"%" # debug
+                    seen_blue = True
+                    # if the colour is seen in both left and right sides, it must be ahead, so flag it so
+                    if blue_dir == "left":
+                        blue_dir = "forward"
+                    else:
+                        blue_dir = "right"
 
-        for c in red_hsv_contours_left:
-            a = cv2.contourArea(c)
-            # if the area is big enough flag it has seen the colour, and its direction
-            if a > 1000.0:
-                cv2.drawContours(cv_image, c, -1, (0, 0, 255), 3)
-                print "i see red:", a,"%" # debug
-                seen_red = True
-                red_dir = "left"
+            for c in red_hsv_contours_left:
+                a = cv2.contourArea(c)
+                # if the area is big enough flag it has seen the colour, and its direction
+                if a > 1000.0:
+                    cv2.drawContours(cv_image, c, -1, (0, 0, 255), 3)
+                    print "i see red:", a,"%" # debug
+                    seen_red = True
+                    red_dir = "left"
 
-        for c in red_hsv_contours_right:
-            a = cv2.contourArea(c)
-            # if the area is big enough flag it has seen the colour, and its direction
-            if a > 1000.0:
-                cv2.drawContours(cv_image, c, -1, (0, 0, 255), 3)
-                print "i see red:", a,"%" # debug
-                seen_red = True
-                red_dir = "right"
+            for c in red_hsv_contours_right:
+                a = cv2.contourArea(c)
+                # if the area is big enough flag it has seen the colour, and its direction
+                if a > 1000.0:
+                    cv2.drawContours(cv_image, c, -1, (0, 0, 255), 3)
+                    print "i see red:", a,"%" # debug
+                    seen_red = True
+                    red_dir = "right"
 
-        for c in green_hsv_contours_left:
-            a = cv2.contourArea(c)
-            # if the area is big enough flag it has seen the colour, and its direction
-            if a > 1000.0:
-                cv2.drawContours(cv_image, c, -1, (0, 255, 0), 3)
-                print "i see green:", a,"%" # debug
-                seen_green = True
-                green_dir = "left"
-                green_a = a
-
-        for c in green_hsv_contours_right:
-            a = cv2.contourArea(c)
-            # if the area is big enough flag it has seen the colour, and its direction
-            if a > 100.0:
-                cv2.drawContours(cv_image, c, -1, (255, 0, 0), 3)
-                print "i see green:", a,"%" # debug
-                seen_green = True
-                # if the colour is seen in both left and right sides, it must be ahead, so flag it so
-                if green_a > 15000 and a > 15000:
-                    green_dir = "forward"
-                else:
-                    green_dir = "right"
+            for c in green_hsv_contours_left:
+                a = cv2.contourArea(c)
+                # if the area is big enough flag it has seen the colour, and its direction
+                if a > 1000.0:
+                    cv2.drawContours(cv_image, c, -1, (0, 255, 0), 3)
+                    print "i see green:", a,"%" # debug
+                    seen_green = True
+                    green_dir = "left"
                     green_a = a
 
-        for c in green_hsv_contours_close:
-            a = cv2.contourArea(c)
-            # if the area is big enough flag it has seen the colour, and its direction
-            if a > 100.0:
-                cv2.drawContours(cv_image, c, -1, (255, 0, 0), 3)
-                print "green is very close!" # debug
-                self.green_close = True
+            for c in green_hsv_contours_right:
+                a = cv2.contourArea(c)
+                # if the area is big enough flag it has seen the colour, and its direction
+                if a > 100.0:
+                    cv2.drawContours(cv_image, c, -1, (255, 0, 0), 3)
+                    print "i see green:", a,"%" # debug
+                    seen_green = True
+                    # if the colour is seen in both left and right sides, it must be ahead, so flag it so
+                    if green_a > 15000 and a > 15000:
+                        green_dir = "forward"
+                    else:
+                        green_dir = "right"
+                        green_a = a
 
-        # feed back all the findings from the camera to the classes variables, for the laser callback to access
-        self.moving_from_red = [seen_red, red_dir]
-        self.moving_to_green = [seen_green, green_dir]
-        self.moving_to_blue = [seen_blue, blue_dir]
+            for c in green_hsv_contours_close:
+                a = cv2.contourArea(c)
+                # if the area is big enough flag it has seen the colour, and its direction
+                if a > 100.0:
+                    cv2.drawContours(cv_image, c, -1, (255, 0, 0), 3)
+                    print "green is very close!" # debug
+                    self.green_close = True
 
-        cv2.waitKey(1)
+            # feed back all the findings from the camera to the classes variables, for the laser callback to access
+            self.moving_from_red = [seen_red, red_dir]
+            self.moving_to_green = [seen_green, green_dir]
+            self.moving_to_blue = [seen_blue, blue_dir]
+
+            cv2.waitKey(1)
 
 
 #cv2.startWindowThread()  # debug
