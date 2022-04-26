@@ -1,6 +1,9 @@
-#!/usr/bin/env python
-# run: roslaunch uol_turtlebot_simulator maze1.launch
-# then run this py file
+"""
+MAZE-NAVIGATOR.py A ROS script to navigate a maze created for the CMP3103M-2122 Autonomous Mobile Robotics - Assessment 1.
+by Laurence Brown | 17636408@students.lincoln.ac.uk
+
+Refer to README.md for usage instructions.
+"""
 
 # import nessacary libraries
 import numpy
@@ -489,7 +492,7 @@ class Follower:
 
             for c in green_hsv_contours_close:
                 a = cv2.contourArea(c)
-                # if the area is big enough flag it has seen the colour, and its direction
+                # if the area is big enough flag it has seen that green is close
                 if a > 100.0:
                     cv2.drawContours(cv_image, c, -1, (255, 0, 0), 3)
                     print "green is very close!" # debug
