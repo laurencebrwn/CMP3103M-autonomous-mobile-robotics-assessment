@@ -91,7 +91,7 @@ class Follower:
         # if the robot is not too close to a wall, move towards the green
         if min_dist > 0.4:
             # if the robot sees green straight ahead, move normally (forward)
-            if self.moving_to_green[1] == "both":
+            if self.moving_to_green[1] == "both" or self.still_turning == True:
                 self.normal_movement(ranges)
             # if the robot sees green to the right, move right towards it
             elif self.moving_to_green[1] == "right":
