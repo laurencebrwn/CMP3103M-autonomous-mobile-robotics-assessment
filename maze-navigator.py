@@ -426,7 +426,7 @@ class Follower:
             for c in blue_hsv_contours_left:
                 a = cv2.contourArea(c)
                 # if the area is big enough flag it has seen the colour, and its direction
-                if a > 100.0:
+                if a > 1000.0:
                     cv2.drawContours(cv_image, c, -1, (255, 0, 0), 3)
                     print "i see blue:", a,"%" # debug
                     seen_blue = True
@@ -436,12 +436,12 @@ class Follower:
             for c in blue_hsv_contours_right:
                 a = cv2.contourArea(c)
                 # if the area is big enough flag it has seen the colour, and its direction
-                if a > 100.0:
+                if a > 1000.0:
                     cv2.drawContours(cv_image, c, -1, (255, 0, 0), 3)
                     print "i see blue:", a,"%" # debug
                     seen_blue = True
                     # if the colour is seen in both left and right sides, it must be ahead, so flag it so
-                    if blue_left_a > 1000 and  a > 1000:
+                    if blue_left_a > 4000 and  a > 4000:
                         blue_dir = "forward"
                     else:
                         blue_dir = "right"
