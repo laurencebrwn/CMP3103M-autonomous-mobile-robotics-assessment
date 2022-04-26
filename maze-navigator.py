@@ -331,7 +331,8 @@ class Follower:
             blue_dir = ""
             seen_green = False
             green_dir = ""
-            green_a = 0
+            green_left_a = 0
+            blue_left_a = 0
 
             # crop image for red floor tiles
             dimensions = cv_image.shape
@@ -430,6 +431,7 @@ class Follower:
                     print "i see blue:", a,"%" # debug
                     seen_blue = True
                     blue_dir = "left"
+                    blue_left_a = a
 
             for c in blue_hsv_contours_right:
                 a = cv2.contourArea(c)
@@ -439,7 +441,7 @@ class Follower:
                     print "i see blue:", a,"%" # debug
                     seen_blue = True
                     # if the colour is seen in both left and right sides, it must be ahead, so flag it so
-                    if blue_dir == "left":
+                    if blue_left_a > 15000 and  a > 15000:
                         blue_dir = "forward"
                     else:
                         blue_dir = "right"
@@ -470,21 +472,20 @@ class Follower:
                     print "i see green:", a,"%" # debug
                     seen_green = True
                     green_dir = "left"
-                    green_a = a
+                    green_left_a = a
 
             for c in green_hsv_contours_right:
                 a = cv2.contourArea(c)
                 # if the area is big enough flag it has seen the colour, and its direction
-                if a > 100.0:
+                if a > 1000.0:
                     cv2.drawContours(cv_image, c, -1, (255, 0, 0), 3)
                     print "i see green:", a,"%" # debug
                     seen_green = True
                     # if the colour is seen in both left and right sides, it must be ahead, so flag it so
-                    if green_a > 15000 and a > 15000:
+                    if green_left_a > 15000 and a > 15000:
                         green_dir = "forward"
                     else:
                         green_dir = "right"
-                        green_a = a
 
             for c in green_hsv_contours_close:
                 a = cv2.contourArea(c)
